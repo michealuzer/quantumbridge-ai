@@ -1061,7 +1061,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (method === 'mobile_money') {
                     details = {
-                        phone: document.getElementById('withdraw-phone')?.value || '',
+                        phone: (document.getElementById('withdraw-country-code')?.value || '') + (document.getElementById('withdraw-phone')?.value || ''),
                         provider: document.getElementById('withdraw-provider')?.value || ''
                     };
                 } else if (method === 'bank_transfer') {
