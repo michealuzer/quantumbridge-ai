@@ -66,7 +66,7 @@
                             <div class="flex gap-2">
                                 <select id="withdraw-country-code" class="bg-white border border-outline-variant/40 rounded-xl px-2 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none text-sm">
                                     <option value="+254">+254 (KE)</option>
-                                    <option value="+256">+256 (UG)</option>
+                                    <option value="+256" selected>+256 (UG)</option>
                                     <option value="+255">+255 (TZ)</option>
                                     <option value="+250">+250 (RW)</option>
                                     <option value="+257">+257 (BI)</option>
@@ -74,7 +74,7 @@
                                     <option value="+27">+27 (ZA)</option>
                                     <option value="+234">+234 (NG)</option>
                                 </select>
-                                <input id="withdraw-phone" type="tel" placeholder="700000000" required
+                                <input id="withdraw-phone" type="tel" placeholder="700000000" required minlength="9" maxlength="10" pattern="[0-9]+" title="Enter a valid 9 or 10 digit phone number without the country code"
                                        class="flex-1 bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none w-full">
                             </div>
                         </div>
@@ -82,7 +82,7 @@
                             <label for="withdraw-provider" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Mobile Provider</label>
                             <select id="withdraw-provider" class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
                                 <option value="mpesa">Safaricom M-Pesa</option>
-                                <option value="airtel">Airtel Money</option>
+                                <option value="airtel" selected>Airtel Money</option>
                                 <option value="mtn">MTN Mobile Money</option>
                             </select>
                         </div>

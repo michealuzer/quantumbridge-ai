@@ -1060,8 +1060,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let details = {};
 
                 if (method === 'mobile_money') {
+                    const rawPhone = document.getElementById('withdraw-phone')?.value || '';
+                    if (!rawPhone || rawPhone.length < 9 || rawPhone.length > 10 || !/^\d+$/.test(rawPhone)) {
+                        alert("Please enter a valid phone number (9-10 digits).");
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = 'Request Payout';
+                        return;
+                    }
                     details = {
-                        phone: (document.getElementById('withdraw-country-code')?.value || '') + (document.getElementById('withdraw-phone')?.value || ''),
+                        phone: (document.getElementById('withdraw-country-code')?.value || '') + rawPhone,
                         provider: document.getElementById('withdraw-provider')?.value || ''
                     };
                 } else if (method === 'bank_transfer') {
