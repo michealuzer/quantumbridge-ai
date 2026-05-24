@@ -970,8 +970,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-        renderDashboardProjects(dbProjects);
-    }
 
     async function syncPendingPaymentBeforeDashboard() {
         const pendingPayment = getPendingPaymentFromStorage();
