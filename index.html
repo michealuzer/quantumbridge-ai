@@ -59,14 +59,9 @@
     <!-- Mobile: Bottom Bar | Desktop: Floating Top -->
     <nav id="control-panel" class="fixed bottom-5 left-1/2 -translate-x-1/2 md:bottom-auto md:top-6 md:w-auto z-[999] glass-panel rounded-full px-2 py-2 md:px-3 md:py-2 flex items-center justify-center gap-1 md:gap-1.5 shadow-2xl transition-all duration-500 transform opacity-0 translate-y-[20px] md:translate-y-[-20px]">
         
-        <a href="#/landing" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
+        <a href="#/landing" data-home-nav class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
             <span class="material-symbols-outlined text-[24px] md:text-[20px]">home</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Home</span>
-        </a>
-        
-        <a href="#/dashboard" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">dashboard</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Account</span>
+            <span data-home-nav-label class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Home</span>
         </a>
 
         <a href="#/explorer" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
@@ -89,7 +84,7 @@
             <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Referrals</span>
         </a>
 
-        <a href="#/history" class="cp-link nav-secondary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
+        <a href="#/history" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
             <span class="material-symbols-outlined text-[24px] md:text-[20px]">account_balance_wallet</span>
             <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Withdraw</span>
         </a>

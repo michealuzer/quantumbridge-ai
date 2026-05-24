@@ -47,8 +47,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (supabaseClient) {
         const { data } = await supabaseClient.auth.getSession();
         currentSession = data.session;
+        syncAuthAwareNav();
         supabaseClient.auth.onAuthStateChange((_event, session) => {
             currentSession = session;
+            syncAuthAwareNav();
             refreshRouteData();
         });
     }
@@ -126,11 +128,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function updateActiveNav(hash) {
+        syncAuthAwareNav();
         document.querySelectorAll('.cp-link').forEach(link => {
             const href = link.getAttribute('href');
             const isActive = href === `#/${hash}` || (hash === '' && href === '#/landing');
             link.classList.toggle('active', isActive);
         });
+    }
+
+    function syncAuthAwareNav() {
+        const homeLink = document.querySelector('[data-home-nav]');
+        const homeLabel = document.querySelector('[data-home-nav-label]');
+        if (!homeLink || !homeLabel) return;
+
+        homeLink.setAttribute('href', currentSession ? '#/dashboard' : '#/landing');
+        homeLabel.textContent = currentSession ? 'Account' : 'Home';
     }
 
     function interceptLinks() {
