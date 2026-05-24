@@ -1,75 +1,115 @@
 <style>
-    .mobile-glass-panel {
-        background: rgba(11, 28, 48, 0.4);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
+    .landing-video-shell {
+        min-height: 100svh;
+        background: #03070c;
     }
-    .text-gradient {
-        background: linear-gradient(135deg, #ffffff 30%, #00d166 100%);
+
+    .landing-video-shell::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+            linear-gradient(90deg, rgba(3, 7, 12, 0.94) 0%, rgba(3, 7, 12, 0.74) 45%, rgba(3, 7, 12, 0.18) 100%),
+            linear-gradient(0deg, rgba(3, 7, 12, 0.98) 0%, rgba(3, 7, 12, 0.22) 44%, rgba(3, 7, 12, 0.42) 100%);
+    }
+
+    .landing-glass {
+        background: rgba(255, 255, 255, 0.09);
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        backdrop-filter: blur(18px) saturate(150%);
+        -webkit-backdrop-filter: blur(18px) saturate(150%);
+    }
+
+    .landing-copy-gradient {
+        background: linear-gradient(135deg, #ffffff 18%, #d9ffe8 58%, #00d166 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
+
+    @media (max-width: 768px) {
+        .landing-video-shell::after {
+            background:
+                linear-gradient(0deg, rgba(3, 7, 12, 0.98) 0%, rgba(3, 7, 12, 0.82) 42%, rgba(3, 7, 12, 0.30) 100%),
+                linear-gradient(90deg, rgba(3, 7, 12, 0.86), rgba(3, 7, 12, 0.22));
+        }
+    }
 </style>
 
-<!-- Mobile App Onboarding Layout -->
-<div class="h-screen w-full bg-[#03070c] text-white overflow-hidden relative font-body flex flex-col">
-    <!-- Background Video (Full Bleed) -->
-    <div class="absolute inset-0 w-full h-full z-0">
-        <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-70">
-            <source src="https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-a-modern-city-at-night-40748-large.mp4" type="video/mp4">
-        </video>
-        <!-- Dark gradient masking from bottom to top so text is readable -->
-        <div class="absolute inset-0 bg-gradient-to-t from-[#03070c] via-[#03070c]/80 to-transparent"></div>
-    </div>
+<div class="landing-video-shell relative w-full overflow-hidden text-white font-body">
+    <video autoplay loop muted playsinline preload="metadata" poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1800" class="absolute inset-0 h-full w-full object-cover opacity-75">
+        <source src="https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-a-modern-city-at-night-40748-large.mp4" type="video/mp4">
+    </video>
 
-    <!-- Top Area (Logo) -->
-    <div class="relative z-10 p-6 flex justify-between items-center w-full max-w-md mx-auto pt-12">
-        <div class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-md">
-            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#00d166]"></span>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-[#00d166] font-display">QuantumBridge</span>
-        </div>
-        <a href="#/explorer" class="text-xs font-bold text-white/70 uppercase tracking-widest hover:text-white transition-colors">Plans</a>
-    </div>
-
-    <!-- Spacer to push content to bottom -->
-    <div class="flex-1"></div>
-
-    <!-- Bottom Content Area (Mobile First) -->
-    <div class="relative z-10 w-full max-w-md mx-auto px-6 pb-28 pt-8 mobile-glass-panel rounded-t-[2.5rem]">
-        <!-- Welcome Headline -->
-        <h1 class="font-display text-4xl leading-[1.1] font-bold mb-4 tracking-tight text-gradient">
-            Put your Capital to work every day
-        </h1>
-
-        <p class="text-sm text-white/70 leading-relaxed mb-8">
-            Access algorithmic real-estate bridge loan funds yielding up to <strong class="text-white">3% daily</strong>. Secure, transparent, and built for modern investors.
-        </p>
-
-        <!-- Feature Mini-grid -->
-        <div class="grid grid-cols-2 gap-3 mb-8">
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <span class="material-symbols-outlined text-primary mb-2 text-xl">payments</span>
-                <p class="font-display text-lg font-bold text-white leading-tight">3.00%</p>
-                <p class="text-[10px] uppercase tracking-wider text-white/50 font-bold mt-1">Daily Yield</p>
-            </div>
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
-                <span class="material-symbols-outlined text-primary mb-2 text-xl">account_balance_wallet</span>
-                <p class="font-display text-lg font-bold text-white leading-tight">$10</p>
-                <p class="text-[10px] uppercase tracking-wider text-white/50 font-bold mt-1">Min Deposit</p>
-            </div>
-        </div>
-
-        <!-- Stacked CTAs for Mobile -->
-        <div class="flex flex-col gap-3">
-            <a href="#/signup" class="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform">
-                Get Started
-                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+    <div class="relative z-10 min-h-screen px-6 pb-36 pt-8 md:px-12 md:pb-28 md:pt-10 max-w-7xl mx-auto flex flex-col">
+        <header class="flex items-center justify-between gap-4">
+            <a href="#/landing" class="landing-glass inline-flex items-center gap-2 rounded-full px-4 py-2">
+                <span class="h-2 w-2 rounded-full bg-primary-container shadow-[0_0_18px_rgba(0,209,102,0.8)]"></span>
+                <span class="font-display text-xs font-bold uppercase tracking-[0.22em] text-primary-container">QuantumTrade</span>
             </a>
-            <a href="#/login" class="w-full flex items-center justify-center gap-2 py-4 bg-white/10 text-white rounded-2xl font-bold border border-white/10 backdrop-blur-md active:bg-white/20 transition-colors">
-                <span class="material-symbols-outlined text-[18px]">login</span>
-                Client Login
-            </a>
-        </div>
+            <div class="flex items-center gap-2">
+                <a href="#/explorer" class="hidden sm:inline-flex rounded-full px-4 py-2 text-xs font-bold uppercase tracking-widest text-white/72 hover:text-white">Plans</a>
+                <a href="#/login" class="rounded-full bg-white/10 border border-white/15 px-4 py-2 text-xs font-bold uppercase tracking-widest text-white backdrop-blur-md hover:bg-white/15">Login</a>
+            </div>
+        </header>
+
+        <main class="flex-1 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_420px] gap-10 items-end md:items-center pt-16 md:pt-20">
+            <section class="max-w-3xl">
+                <div class="landing-glass inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6">
+                    <span class="material-symbols-outlined text-primary-container text-[18px]">verified_user</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Investor account infrastructure</span>
+                </div>
+
+                <h1 class="landing-copy-gradient font-display text-5xl leading-[0.96] md:text-7xl md:leading-[0.92] font-bold tracking-tight max-w-4xl">
+                    Build your account before you choose your plan.
+                </h1>
+
+                <p class="mt-6 max-w-2xl text-base md:text-lg leading-8 text-white/72">
+                    Load funds, see your confirmed balance, compare plan returns, and activate only the packages your account can cover.
+                </p>
+
+                <div class="mt-8 flex flex-col sm:flex-row gap-3">
+                    <a href="#/signup" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-6 py-4 font-bold text-white shadow-xl shadow-primary/30">
+                        Create Account
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+                    </a>
+                    <a href="#/explorer" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 border border-white/15 px-6 py-4 font-bold text-white backdrop-blur-md">
+                        View Plans
+                        <span class="material-symbols-outlined text-[20px]">monitoring</span>
+                    </a>
+                </div>
+            </section>
+
+            <aside class="landing-glass rounded-[2rem] p-5 md:p-6">
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
+                        <span class="material-symbols-outlined text-primary-container text-[22px]">account_balance_wallet</span>
+                        <p class="font-display text-2xl font-bold mt-3">$10</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Minimum load</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
+                        <span class="material-symbols-outlined text-primary-container text-[22px]">currency_exchange</span>
+                        <p class="font-display text-2xl font-bold mt-3">UGX/KES</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Converted to USD</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
+                        <span class="material-symbols-outlined text-primary-container text-[22px]">lock_clock</span>
+                        <p class="font-display text-2xl font-bold mt-3">Optional</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Compounding lock</p>
+                    </div>
+                    <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
+                        <span class="material-symbols-outlined text-primary-container text-[22px]">payments</span>
+                        <p class="font-display text-2xl font-bold mt-3">Live</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Backend balance</p>
+                    </div>
+                </div>
+                <div class="mt-5 rounded-2xl bg-primary/90 p-5">
+                    <p class="text-[10px] uppercase tracking-[0.2em] text-white/55 font-bold">Next step</p>
+                    <p class="font-display text-2xl font-bold mt-2">Load account first</p>
+                    <p class="text-sm text-white/70 leading-6 mt-2">Packages unlock from confirmed backend balance, not demo data.</p>
+                    <a href="#/onboarding" class="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-bold text-primary">Load Account</a>
+                </div>
+            </aside>
+        </main>
     </div>
 </div>
