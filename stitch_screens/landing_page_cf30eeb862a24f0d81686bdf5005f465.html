@@ -1,162 +1,75 @@
 <style>
-    .qt-grid-bg {
-        background-image:
-            linear-gradient(rgba(0, 209, 102, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 97, 164, 0.03) 1px, transparent 1px);
-        background-size: 40px 40px;
-        mask-image: linear-gradient(to bottom, black 0%, black 60%, transparent 100%);
+    .mobile-glass-panel {
+        background: rgba(11, 28, 48, 0.4);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
     }
-
-    .glow-effect {
-        box-shadow: 0 0 40px rgba(0, 209, 102, 0.15);
-    }
-
     .text-gradient {
-        background: linear-gradient(135deg, #ffffff 40%, #00d166 100%);
+        background: linear-gradient(135deg, #ffffff 30%, #00d166 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 </style>
 
-<div class="min-h-screen bg-[#03070c] text-white overflow-hidden font-body">
-    <!-- Hero Section with Background Video -->
-    <section class="relative min-h-[95vh] flex items-center justify-center px-6 py-20 md:px-12 md:py-32">
-        <!-- Background Video Loop -->
-        <div class="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-            <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-35 scale-105">
-                <source src="https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-a-modern-city-at-night-40748-large.mp4" type="video/mp4">
-            </video>
-            <!-- Rich Dark Gradient Overlay to blend the video -->
-            <div class="absolute inset-0 bg-gradient-to-b from-[#03070c]/50 via-[#03070c]/85 to-[#03070c]"></div>
-            <div class="qt-grid-bg absolute inset-0"></div>
+<!-- Mobile App Onboarding Layout -->
+<div class="h-screen w-full bg-[#03070c] text-white overflow-hidden relative font-body flex flex-col">
+    <!-- Background Video (Full Bleed) -->
+    <div class="absolute inset-0 w-full h-full z-0">
+        <video autoplay loop muted playsinline class="w-full h-full object-cover opacity-70">
+            <source src="https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-a-modern-city-at-night-40748-large.mp4" type="video/mp4">
+        </video>
+        <!-- Dark gradient masking from bottom to top so text is readable -->
+        <div class="absolute inset-0 bg-gradient-to-t from-[#03070c] via-[#03070c]/80 to-transparent"></div>
+    </div>
+
+    <!-- Top Area (Logo) -->
+    <div class="relative z-10 p-6 flex justify-between items-center w-full max-w-md mx-auto pt-12">
+        <div class="flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 py-1.5 backdrop-blur-md">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_#00d166]"></span>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-[#00d166] font-display">QuantumBridge</span>
+        </div>
+        <a href="#/explorer" class="text-xs font-bold text-white/70 uppercase tracking-widest hover:text-white transition-colors">Plans</a>
+    </div>
+
+    <!-- Spacer to push content to bottom -->
+    <div class="flex-1"></div>
+
+    <!-- Bottom Content Area (Mobile First) -->
+    <div class="relative z-10 w-full max-w-md mx-auto px-6 pb-28 pt-8 mobile-glass-panel rounded-t-[2.5rem]">
+        <!-- Welcome Headline -->
+        <h1 class="font-display text-4xl leading-[1.1] font-bold mb-4 tracking-tight text-gradient">
+            Put your Capital to work every day
+        </h1>
+
+        <p class="text-sm text-white/70 leading-relaxed mb-8">
+            Access algorithmic real-estate bridge loan funds yielding up to <strong class="text-white">3% daily</strong>. Secure, transparent, and built for modern investors.
+        </p>
+
+        <!-- Feature Mini-grid -->
+        <div class="grid grid-cols-2 gap-3 mb-8">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                <span class="material-symbols-outlined text-primary mb-2 text-xl">payments</span>
+                <p class="font-display text-lg font-bold text-white leading-tight">3.00%</p>
+                <p class="text-[10px] uppercase tracking-wider text-white/50 font-bold mt-1">Daily Yield</p>
+            </div>
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
+                <span class="material-symbols-outlined text-primary mb-2 text-xl">account_balance_wallet</span>
+                <p class="font-display text-lg font-bold text-white leading-tight">$10</p>
+                <p class="text-[10px] uppercase tracking-wider text-white/50 font-bold mt-1">Min Deposit</p>
+            </div>
         </div>
 
-        <div class="relative z-10 max-w-5xl mx-auto w-full flex flex-col items-center text-center">
-            <!-- App Title / Logo -->
-            <div class="flex items-center gap-3 mb-8 bg-white/5 border border-white/10 rounded-full px-5 py-2 backdrop-blur-md">
-                <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_#00d166]"></span>
-                <span class="text-xs font-bold uppercase tracking-[0.3em] text-[#00d166] font-display">QuantumBridge AI Portal</span>
-            </div>
-
-            <!-- Welcome Headline -->
-            <h1 class="font-display text-[45px] leading-[48px] md:text-[75px] md:leading-[80px] font-bold mb-6 max-w-4xl tracking-tight text-gradient">
-                Put your Capital to work every day
-            </h1>
-
-            <p class="font-body text-base md:text-xl text-white/70 max-w-3xl leading-relaxed mb-10">
-                Welcome to QuantumBridge AI. We connect client capital with premium, algorithmic real-estate bridge loan funds yielding up to 3% daily. Secure, transparent, and completely automated.
-            </p>
-
-            <!-- Status badges -->
-            <div class="flex flex-wrap justify-center gap-3 mb-10">
-                <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white/80 backdrop-blur-sm">⚡ Min. Deposit: $10 USD</span>
-                <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white/80 backdrop-blur-sm">📈 24/7 Yield Accrual</span>
-                <span class="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-white/80 backdrop-blur-sm">🔒 RLS Secured Platform</span>
-            </div>
-
-            <!-- Main CTAs -->
-            <div class="flex flex-col sm:flex-row justify-center gap-4 mb-14 w-full sm:w-auto">
-                <a href="#/signup" class="inline-flex items-center justify-center gap-2 px-8 py-4.5 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/20 hover:opacity-95 transition-opacity text-base">
-                    <span class="material-symbols-outlined text-[22px]">account_balance</span>
-                    Get Started Now
-                </a>
-                <a href="#/explorer" class="inline-flex items-center justify-center gap-2 px-8 py-4.5 bg-white/5 text-white rounded-2xl font-bold border border-white/10 backdrop-blur-md hover:bg-white/10 transition-colors text-base">
-                    <span class="material-symbols-outlined text-[22px]">payments</span>
-                    Explore Plans
-                </a>
-                <a href="#/login" class="inline-flex items-center justify-center gap-2 px-8 py-4.5 bg-white text-[#03070c] rounded-2xl font-bold hover:bg-white/90 transition-colors text-base shadow-lg">
-                    <span class="material-symbols-outlined text-[22px]">login</span>
-                    Client Login
-                </a>
-            </div>
-
-            <!-- Dynamic Stats Summary Grid -->
-            <div class="grid grid-cols-3 gap-4 max-w-3xl w-full">
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md text-center glow-effect">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50">Starter Yield</p>
-                    <p class="font-display text-3xl md:text-4xl font-bold text-primary mt-1">3.00%</p>
-                    <p class="text-xs text-white/40 mt-1">accrued daily</p>
-                </div>
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md text-center glow-effect">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50">Withdrawals</p>
-                    <p class="font-display text-3xl md:text-4xl font-bold mt-1 text-white">24H</p>
-                    <p class="text-xs text-white/40 mt-1">processing window</p>
-                </div>
-                <div class="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-md text-center glow-effect">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50">Flexible Terms</p>
-                    <p class="font-display text-3xl md:text-4xl font-bold mt-1 text-white">14-120</p>
-                    <p class="text-xs text-white/40 mt-1">investment days</p>
-                </div>
-            </div>
+        <!-- Stacked CTAs for Mobile -->
+        <div class="flex flex-col gap-3">
+            <a href="#/signup" class="w-full flex items-center justify-center gap-2 py-4 bg-primary text-white rounded-2xl font-bold shadow-lg shadow-primary/30 active:scale-[0.98] transition-transform">
+                Get Started
+                <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+            <a href="#/login" class="w-full flex items-center justify-center gap-2 py-4 bg-white/10 text-white rounded-2xl font-bold border border-white/10 backdrop-blur-md active:bg-white/20 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">login</span>
+                Client Login
+            </a>
         </div>
-    </section>
-
-    <!-- Key Investment Advantages -->
-    <section class="px-6 pb-20 md:px-12 md:pb-28">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <article class="bg-white/5 rounded-3xl p-8 border border-white/10 backdrop-blur-sm flex flex-col justify-between">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-6">trending_up</span>
-                    <div>
-                        <h3 class="font-display text-xl font-bold mb-3">Structured Debt Yields</h3>
-                        <p class="text-white/60 leading-relaxed text-sm">Diversify capital into institutional bridge loans. Choose term options optimized for your treasury speed.</p>
-                    </div>
-                </article>
-                <article class="bg-white/5 rounded-3xl p-8 border border-white/10 backdrop-blur-sm flex flex-col justify-between">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-6">query_stats</span>
-                    <div>
-                        <h3 class="font-display text-xl font-bold mb-3">Live Yield Tracking</h3>
-                        <p class="text-white/60 leading-relaxed text-sm">Real-time daily yield calculations projected clearly on your secure investor control panel.</p>
-                    </div>
-                </article>
-                <article class="bg-white/5 rounded-3xl p-8 border border-white/10 backdrop-blur-sm flex flex-col justify-between">
-                    <span class="material-symbols-outlined text-primary text-4xl mb-6">verified_user</span>
-                    <div>
-                        <h3 class="font-display text-xl font-bold mb-3">Enterprise Security</h3>
-                        <p class="text-white/60 leading-relaxed text-sm">All operations are protected by state-of-the-art authentication protocols and Supabase RLS.</p>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
-
-    <!-- Detailed Feature Highlight Section -->
-    <section class="px-6 pb-32 md:px-12">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-            <div class="lg:col-span-5 bg-gradient-to-br from-primary to-primary-container text-white rounded-3xl p-8 md:p-10 shadow-xl flex flex-col justify-between">
-                <div>
-                    <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70 mb-4">Secured Placements</p>
-                    <h2 class="font-display text-3xl md:text-4xl font-bold leading-tight mb-5">Institutional lending, automated.</h2>
-                    <p class="text-white/80 leading-relaxed mb-8">QuantumBridge automates private debt allocations. Your funds are matched to credit-vetted real estate developers requiring short-term capital.</p>
-                </div>
-                <a href="#/signup" class="inline-flex items-center justify-center gap-2 px-6 py-4 bg-white text-[#03070c] rounded-2xl font-bold hover:bg-white/90 transition-colors w-fit">
-                    <span class="material-symbols-outlined text-[20px]">person_add</span>
-                    Open Investor Account
-                </a>
-            </div>
-
-            <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <article class="bg-white/5 rounded-2xl p-6 border border-white/10">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Portfolio Options</p>
-                    <h3 class="font-display text-2xl font-bold mt-2">6 Plans</h3>
-                    <p class="text-white/60 leading-relaxed text-xs mt-2">Find a placement tier optimized for your capital scale, with rates scaling up to 3% daily.</p>
-                </article>
-                <article class="bg-white/5 rounded-2xl p-6 border border-white/10">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Yield Accrual</p>
-                    <h3 class="font-display text-2xl font-bold text-primary mt-2">Daily</h3>
-                    <p class="text-white/60 leading-relaxed text-xs mt-2">Watch your interest grow hour-by-hour directly inside the investor control panel.</p>
-                </article>
-                <article class="bg-white/5 rounded-2xl p-6 border border-white/10">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Redemptions</p>
-                    <h3 class="font-display text-2xl font-bold mt-2">Seamless</h3>
-                    <p class="text-white/60 leading-relaxed text-xs mt-2">At term completion, request partial or full payout back to your external bank or wallet.</p>
-                </article>
-                <article class="bg-white/5 rounded-2xl p-6 border border-white/10">
-                    <p class="text-[10px] font-bold uppercase tracking-wider text-white/40">Compliance</p>
-                    <h3 class="font-display text-2xl font-bold mt-2">Backed</h3>
-                    <p class="text-white/60 leading-relaxed text-xs mt-2">Protected by secure authentication systems keeping client accounts isolated and safe.</p>
-                </article>
-            </div>
-        </div>
-    </section>
+    </div>
 </div>
