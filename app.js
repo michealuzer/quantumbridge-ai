@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let currentDynamicStyles = [];
     let currentSession = null;
     let pendingRoute = null;
+    captureReferralCode();
 
     const supabaseConfig = window.QUANTUMBRIDGE_AUTH_CONFIG || window.QUANTUMTRADE_AUTH_CONFIG || {};
     const supabaseLibrary = typeof supabase !== 'undefined'
@@ -56,6 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function loadRoute() {
+        captureReferralCode();
         let hash = window.location.hash.replace('#/', '').split('?')[0] || '';
         if (!routes[hash]) hash = '';
 
@@ -229,6 +231,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function bindSignupForm() {
         const form = document.getElementById('signup-form');
         if (!form) return;
+        showSignupReferralNote();
 
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -244,7 +247,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (!requireSupabase(form)) return;
             setFormState(form, true, 'Creating account...');
-            const { data, error } = await supabaseClient.auth.signUp({ email, password });
+            const referralCode = getStoredReferralCode();
+            const signUpOptions = referralCode
+                ? { data: { referral_code: referralCode } }
+                : undefined;
+            const { data, error } = await supabaseClient.auth.signUp({
+                email,
+                password,
+                options: signUpOptions,
+            });
 
             if (error) {
                 setFormState(form, false, error.message, 'error');
@@ -345,6 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (hash === 'onboarding') await hydrateFundingForm();
             if (hash === 'live_projects') await hydrateStandaloneProjects();
             if (hash === 'history') await hydrateWithdrawalPage();
+            if (hash === 'elite_tier') await hydrateReferralPage();
         } catch (error) {
             console.error('Hydration error:', error);
         }
@@ -794,6 +806,72 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderDashboardProjects(dbProjects);
     }
 
+    async function hydrateReferralPage() {
+        if (!currentSession) return;
+
+        const [profileResult, commissionResult, directResult] = await Promise.all([
+            supabaseClient
+                .from('qt_profiles')
+                .select('investor_code')
+                .eq('user_id', currentSession.user.id)
+                .maybeSingle(),
+            supabaseClient
+                .from('qt_referral_commissions')
+                .select('amount_usd,level,rate_percent,status,created_at')
+                .order('created_at', { ascending: false }),
+            supabaseClient
+                .from('qt_profiles')
+                .select('user_id,display_name,email,created_at')
+                .eq('referrer_user_id', currentSession.user.id)
+                .order('created_at', { ascending: false }),
+        ]);
+
+        if (profileResult.error) console.error(profileResult.error);
+        if (commissionResult.error) console.error(commissionResult.error);
+        if (directResult.error) console.error(directResult.error);
+
+        const code = profileResult.data?.investor_code || '';
+        const link = code ? buildReferralLink(code) : '';
+        const commissions = commissionResult.data || [];
+        const directReferrals = directResult.data || [];
+        const totalEarned = commissions.reduce((sum, row) => sum + Number(row.amount_usd || 0), 0);
+
+        setText('referral-link', link || 'Your referral link will appear after your profile is ready.');
+        setText('referral-total-earned', formatCurrency(totalEarned));
+        setText('referral-direct-count', `${directReferrals.length} direct investor${directReferrals.length === 1 ? '' : 's'} invited.`);
+
+        const copyButton = document.getElementById('copy-referral-link');
+        const copyMessage = document.getElementById('referral-copy-message');
+        if (copyButton) {
+            copyButton.disabled = !link;
+            copyButton.addEventListener('click', async () => {
+                if (!link) return;
+                await navigator.clipboard?.writeText(link);
+                if (copyMessage) copyMessage.textContent = 'Referral link copied.';
+            });
+        }
+
+        const list = document.getElementById('referral-commission-list');
+        if (!list) return;
+        if (!commissions.length) {
+            list.innerHTML = '<p class="text-sm text-on-surface/50 py-6">No commission activity yet. Share your link to invite investors.</p>';
+            return;
+        }
+
+        list.innerHTML = commissions.slice(0, 12).map(row => `
+            <div class="py-5 flex items-center justify-between gap-4">
+                <div>
+                    <p class="font-bold">Level ${Number(row.level || 1)} commission</p>
+                    <p class="text-xs text-on-surface/45 uppercase tracking-widest mt-1">${formatPercent(row.rate_percent)} earned - ${timeAgo(row.created_at)}</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-display text-xl font-bold text-primary">+${formatCurrency(row.amount_usd)}</p>
+                    <p class="text-xs text-on-surface/45 uppercase tracking-widest">${escapeHtml(row.status || 'earned')}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
     async function hydrateWithdrawalPage() {
         const principalEl = document.getElementById('withdraw-active-principal');
         const balanceEl = document.getElementById('withdraw-available-balance');
@@ -1153,6 +1231,40 @@ document.addEventListener('DOMContentLoaded', async () => {
     function setText(id, value) {
         const el = document.getElementById(id);
         if (el) el.textContent = value;
+    }
+
+    function captureReferralCode() {
+        const code = getReferralCodeFromUrl();
+        if (code) localStorage.setItem('quantumtrade_referral_code', code);
+    }
+
+    function getReferralCodeFromUrl() {
+        const searchCode = new URLSearchParams(window.location.search).get('ref');
+        const hash = window.location.hash || '';
+        const hashQuery = hash.includes('?') ? hash.slice(hash.indexOf('?') + 1) : '';
+        const hashCode = new URLSearchParams(hashQuery).get('ref');
+        return sanitizeReferralCode(searchCode || hashCode);
+    }
+
+    function getStoredReferralCode() {
+        return sanitizeReferralCode(localStorage.getItem('quantumtrade_referral_code') || '');
+    }
+
+    function sanitizeReferralCode(value) {
+        return String(value || '').trim().toUpperCase().replace(/[^A-Z0-9-]/g, '').slice(0, 32);
+    }
+
+    function showSignupReferralNote() {
+        const note = document.getElementById('signup-referral-note');
+        if (!note) return;
+        note.classList.toggle('hidden', !getStoredReferralCode());
+    }
+
+    function buildReferralLink(code) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = `/signup?ref=${encodeURIComponent(code)}`;
+        return url.toString();
     }
 
     const fundingUsdRates = {

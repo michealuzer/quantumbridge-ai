@@ -27,17 +27,32 @@
         <div class="bg-surface-container-low rounded-[2rem] p-8">
             <h2 class="font-display text-2xl font-bold mb-6">Referral Tools</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Unique Referral Link</p><p class="text-sm text-on-surface/60 mt-2">Automatically created at sign-up.</p></div>
-                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Real-Time Analytics</p><p class="text-sm text-on-surface/60 mt-2">Track clicks, sign-ups, deposits, and payouts.</p></div>
-                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Instant Commission Credit</p><p class="text-sm text-on-surface/60 mt-2">Withdraw or reinvest commissions.</p></div>
-                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Approved Assets</p><p class="text-sm text-on-surface/60 mt-2">Use banners and text links for sharing.</p></div>
+                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Unique Referral Link</p><p class="text-sm text-on-surface/60 mt-2">Share your personal invite link with new investors.</p></div>
+                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Investor Network</p><p id="referral-direct-count" class="text-sm text-on-surface/60 mt-2">Loading invited investors...</p></div>
+                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Commission Credit</p><p class="text-sm text-on-surface/60 mt-2">Earn on confirmed deposits across three levels.</p></div>
+                <div class="bg-white rounded-2xl p-5"><p class="font-bold">Share Anywhere</p><p class="text-sm text-on-surface/60 mt-2">Use your link in WhatsApp, email, social pages, or direct messages.</p></div>
             </div>
         </div>
         <aside class="bg-on-surface text-white rounded-[2rem] p-8">
-            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Commission Example</span>
-            <div class="font-display text-5xl font-bold mt-3">$6,500</div>
-            <p class="text-sm opacity-75 mt-4">Estimated commission from $200,000 in network deposits.</p>
-            <button class="w-full mt-8 py-4 bg-white text-on-surface rounded-xl font-bold">Copy Referral Link</button>
+            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Your Referral Link</span>
+            <div id="referral-total-earned" class="font-display text-5xl font-bold mt-3">$0.00</div>
+            <p class="text-sm opacity-75 mt-4">Total commission earned from confirmed investor deposits.</p>
+            <div class="mt-6 rounded-2xl bg-white/10 border border-white/15 p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest opacity-50">Invite URL</p>
+                <p id="referral-link" class="text-sm font-semibold mt-2 break-all text-white/80">Loading your referral link...</p>
+            </div>
+            <button id="copy-referral-link" class="w-full mt-5 py-4 bg-white text-on-surface rounded-xl font-bold">Copy Referral Link</button>
+            <p id="referral-copy-message" class="min-h-5 text-sm opacity-70 mt-3"></p>
         </aside>
+    </section>
+
+    <section class="mt-6 bg-surface-container-low rounded-[2rem] p-8">
+        <div class="flex items-center justify-between gap-4 mb-5">
+            <h2 class="font-display text-2xl font-bold">Commission Activity</h2>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-primary">Live</span>
+        </div>
+        <div id="referral-commission-list" class="flex flex-col divide-y divide-outline-variant/30">
+            <p class="text-sm text-on-surface/50 py-6">Loading commission activity...</p>
+        </div>
     </section>
 </div>

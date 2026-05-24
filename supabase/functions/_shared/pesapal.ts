@@ -215,6 +215,7 @@ export async function creditInvestmentBalance(
         updated_at: new Date().toISOString(),
       })
       .eq("id", investment.id);
+    await awardReferralCommissions(supabase, payment.id, payment.user_id, amount);
     return;
   }
 
@@ -224,6 +225,45 @@ export async function creditInvestmentBalance(
     principal_usd: amount,
     status: "active",
   });
+  await awardReferralCommissions(supabase, payment.id, payment.user_id, amount);
+}
+
+async function awardReferralCommissions(
+  supabase: ReturnType<typeof getServiceClient>,
+  paymentId: string,
+  sourceUserId: string,
+  amountUsd: number,
+) {
+  const rates = [5, 2, 1];
+  let nextSourceUserId: string | null = sourceUserId;
+
+  for (let level = 1; level <= rates.length; level += 1) {
+    const { data: sourceProfile } = await supabase
+      .from("qt_profiles")
+      .select("referrer_user_id")
+      .eq("user_id", nextSourceUserId)
+      .maybeSingle();
+
+    const beneficiaryUserId = sourceProfile?.referrer_user_id;
+    if (!beneficiaryUserId) break;
+
+    const ratePercent = rates[level - 1];
+    const commissionAmount = Number(((amountUsd * ratePercent) / 100).toFixed(2));
+
+    await supabase
+      .from("qt_referral_commissions")
+      .upsert({
+        payment_id: paymentId,
+        source_user_id: sourceUserId,
+        beneficiary_user_id: beneficiaryUserId,
+        level,
+        rate_percent: ratePercent,
+        amount_usd: commissionAmount,
+        status: "earned",
+      }, { onConflict: "payment_id,beneficiary_user_id,level", ignoreDuplicates: true });
+
+    nextSourceUserId = beneficiaryUserId;
+  }
 }
 
 const currencyUsdRates: Record<string, number> = {
