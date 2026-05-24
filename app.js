@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function requireSupabase(form) {
         if (supabaseClient) return true;
-        setFormState(form, false, hasSupabaseConfig ? 'Supabase could not load. Refresh the page and try again.' : 'Supabase is not configured. Add your URL and anon key in auth-config.js.', 'error');
+        setFormState(form, false, hasSupabaseConfig ? 'Investor access could not load. Refresh the page and try again.' : 'Investor access is being prepared. Please try again shortly.', 'error');
         return false;
     }
 
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();
 
             if (!supabaseClient) {
-                setFundingState(form, false, 'Supabase is not configured.', 'error');
+                setFundingState(form, false, 'Investor access is being prepared. Please try again shortly.', 'error');
                 return;
             }
 
@@ -608,7 +608,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
             equivalentEl.className = `text-sm mt-1 ${isBelowMinimum ? 'text-red-700 font-semibold' : 'text-on-surface/55'}`;
         }
-        if (noteEl) noteEl.textContent = selectedPlan.dataset.description || 'Choose a QuantumBridge fund to continue.';
+        if (noteEl) noteEl.textContent = selectedPlan.dataset.description || 'Choose a QuantumTrade fund to continue.';
 
         const emailEl = document.getElementById('funding-email');
         if (emailEl && !emailEl.value && currentSession?.user?.email) {
@@ -760,8 +760,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         let dbProjects = projectsResult.data || [];
         const plan = investment?.qt_plans;
 
-        setText('dashboard-investor-code', profile?.investor_code ? `QuantumBridge Investor: ${profile.investor_code}` : 'QuantumBridge Investor');
-        setText('dashboard-display-name', profile?.display_name || profile?.email || 'QuantumBridge Client');
+        setText('dashboard-investor-code', profile?.investor_code ? `QuantumTrade Investor: ${profile.investor_code}` : 'QuantumTrade Investor');
+        setText('dashboard-display-name', profile?.display_name || profile?.email || 'QuantumTrade Client');
         setText('dashboard-plan-name', plan?.name || 'No active plan');
 
         if (investment) {
@@ -993,7 +993,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (statusCode === 1 || description === 'COMPLETED') {
                 sessionStorage.removeItem('quantumbridge_pending_payment');
-                showDashboardPaymentBanner('Payment confirmed. Your backend balance has been refreshed.', 'success');
+                showDashboardPaymentBanner('Payment confirmed. Your account balance has been refreshed.', 'success');
                 setTimeout(() => showDashboardPaymentBanner('', 'hidden'), 4500);
                 return;
             }

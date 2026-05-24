@@ -4,6 +4,24 @@
         background: #03070c;
     }
 
+    .landing-motion-layer {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        opacity: 0.42;
+        background:
+            linear-gradient(115deg, transparent 0 38%, rgba(0, 209, 102, 0.18) 44%, transparent 52% 100%),
+            radial-gradient(circle at 72% 28%, rgba(0, 209, 102, 0.20), transparent 26%),
+            radial-gradient(circle at 18% 78%, rgba(209, 228, 255, 0.18), transparent 24%);
+        background-size: 180% 180%, 100% 100%, 100% 100%;
+        animation: landingMotion 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes landingMotion {
+        from { transform: scale(1.02) translate3d(-1.5%, 0, 0); background-position: 0% 50%, center, center; }
+        to { transform: scale(1.08) translate3d(1.5%, -1%, 0); background-position: 100% 50%, center, center; }
+    }
+
     .landing-video-shell::after {
         content: "";
         position: absolute;
@@ -37,9 +55,10 @@
 </style>
 
 <div class="landing-video-shell relative w-full overflow-hidden text-white font-body">
-    <video autoplay loop muted playsinline preload="metadata" poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1800" class="absolute inset-0 h-full w-full object-cover opacity-75">
+    <video autoplay loop muted playsinline preload="auto" poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=1800" class="absolute inset-0 h-full w-full object-cover opacity-75">
         <source src="https://assets.mixkit.co/videos/preview/mixkit-time-lapse-of-a-modern-city-at-night-40748-large.mp4" type="video/mp4">
     </video>
+    <div class="landing-motion-layer"></div>
 
     <div class="relative z-10 min-h-screen px-6 pb-36 pt-8 md:px-12 md:pb-28 md:pt-10 max-w-7xl mx-auto flex flex-col">
         <header class="flex items-center justify-between gap-4">
@@ -57,15 +76,15 @@
             <section class="max-w-3xl">
                 <div class="landing-glass inline-flex items-center gap-2 rounded-full px-4 py-2 mb-6">
                     <span class="material-symbols-outlined text-primary-container text-[18px]">verified_user</span>
-                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Investor account infrastructure</span>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">Private investor access</span>
                 </div>
 
                 <h1 class="landing-copy-gradient font-display text-5xl leading-[0.96] md:text-7xl md:leading-[0.92] font-bold tracking-tight max-w-4xl">
-                    Build your account before you choose your plan.
+                    Put your capital to work with a plan you can follow.
                 </h1>
 
                 <p class="mt-6 max-w-2xl text-base md:text-lg leading-8 text-white/72">
-                    Load funds, see your confirmed balance, compare plan returns, and activate only the packages your account can cover.
+                    Fund your account, choose a package that matches your balance, and track your growth from one clear investor dashboard.
                 </p>
 
                 <div class="mt-8 flex flex-col sm:flex-row gap-3">
@@ -90,7 +109,7 @@
                     <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
                         <span class="material-symbols-outlined text-primary-container text-[22px]">currency_exchange</span>
                         <p class="font-display text-2xl font-bold mt-3">UGX/KES</p>
-                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Converted to USD</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Local funding</p>
                     </div>
                     <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
                         <span class="material-symbols-outlined text-primary-container text-[22px]">lock_clock</span>
@@ -100,13 +119,13 @@
                     <div class="rounded-2xl bg-white/8 border border-white/10 p-4">
                         <span class="material-symbols-outlined text-primary-container text-[22px]">payments</span>
                         <p class="font-display text-2xl font-bold mt-3">Live</p>
-                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Backend balance</p>
+                        <p class="text-[10px] uppercase tracking-widest text-white/45 font-bold mt-1">Account balance</p>
                     </div>
                 </div>
                 <div class="mt-5 rounded-2xl bg-primary/90 p-5">
                     <p class="text-[10px] uppercase tracking-[0.2em] text-white/55 font-bold">Next step</p>
                     <p class="font-display text-2xl font-bold mt-2">Load account first</p>
-                    <p class="text-sm text-white/70 leading-6 mt-2">Packages unlock from confirmed backend balance, not demo data.</p>
+                    <p class="text-sm text-white/70 leading-6 mt-2">Packages unlock after funds are confirmed in your investor account.</p>
                     <a href="#/onboarding" class="mt-5 inline-flex w-full items-center justify-center rounded-xl bg-white px-4 py-3 text-sm font-bold text-primary">Load Account</a>
                 </div>
             </aside>
