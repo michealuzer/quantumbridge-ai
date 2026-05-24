@@ -1410,7 +1410,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                                 </div>
                                 <div class="flex-1">
                                     <p class="font-body font-bold text-on-surface/85">${escapeHtml(w.masked_email || 'u***@user.com')}</p>
-                                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - ${timeAgo(w.created_at)}</p>
+                                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest payout-time" data-time="${new Date(w.created_at).getTime()}">Payout - ${timeAgo(w.created_at)}</p>
                                 </div>
                                 <div class="text-right">
                                     <p class="font-display font-bold text-primary">${formatCurrency(w.amount_usd)}</p>
@@ -1464,7 +1464,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <div class="flex-1">
                     <p class="font-body font-bold text-on-surface/85">${email}</p>
-                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - Just now</p>
+                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest payout-time" data-time="${Date.now()}">Payout - Just now</p>
                 </div>
                 <div class="text-right">
                     <p class="font-display font-bold text-primary">$${amount}</p>
@@ -1489,9 +1489,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                 container.removeChild(container.lastChild);
             }
 
-            // Schedule next one between 4 and 15 seconds
-            const nextDelay = Math.random() * (15000 - 4000) + 4000;
-            setTimeout(addFakePayout, nextDelay);
+            // Schedule next fake payout (between 8 and 35 seconds)
+            setTimeout(addFakePayout, Math.random() * (35000 - 8000) + 8000);
+        }
+
+        // Setup dynamic aging for the timestamps
+        if (!window.quantumbridgeLiveSimulatorTimer) {
+            window.quantumbridgeLiveSimulatorTimer = setInterval(() => {
+                const timeElements = document.querySelectorAll('.payout-time');
+                const now = Date.now();
+                timeElements.forEach(el => {
+                    const time = parseInt(el.getAttribute('data-time'), 10);
+                    if (!time) return;
+                    const diffSeconds = Math.floor((now - time) / 1000);
+                    if (diffSeconds < 10) {
+                        el.textContent = 'Payout - Just now';
+                    } else if (diffSeconds < 60) {
+                        el.textContent = `Payout - ${diffSeconds}s ago`;
+                    } else {
+                        const mins = Math.floor(diffSeconds / 60);
+                        el.textContent = `Payout - ${mins}m ago`;
+                    }
+                });
+            }, 1000);
         }
 
         // Start loop
