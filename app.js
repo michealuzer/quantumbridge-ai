@@ -825,7 +825,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function hydrateDashboardReferralSummary(profile, commissions, directReferrals) {
-        const code = profile?.investor_code || '';
+        let code = profile?.investor_code || '';
+        
+        // Auto-generate code if missing
+        if (!code && currentSession?.user?.id) {
+            code = 'QT' + currentSession.user.id.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase();
+            supabaseClient.from('qt_profiles').update({ investor_code: code }).eq('user_id', currentSession.user.id).then();
+        }
+
         const link = code ? buildReferralLink(code) : '';
         const totalEarned = (commissions || []).reduce((sum, row) => sum + Number(row.amount_usd || 0), 0);
 
@@ -868,11 +875,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (profileResult.error) console.error(profileResult.error);
         if (commissionResult.error) console.error(commissionResult.error);
         if (directResult.error) console.error(directResult.error);
-
-        const code = profileResult.data?.investor_code || '';
-        const link = code ? buildReferralLink(code) : '';
         const commissions = commissionResult.data || [];
         const directReferrals = directResult.data || [];
+        
+        let code = profileResult.data?.investor_code || '';
+        if (!code && currentSession?.user?.id) {
+            code = 'QT' + currentSession.user.id.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase();
+            supabaseClient.from('qt_profiles').update({ investor_code: code }).eq('user_id', currentSession.user.id).then();
+        }
+
+        const link = code ? buildReferralLink(code) : '';
         const totalEarned = commissions.reduce((sum, row) => sum + Number(row.amount_usd || 0), 0);
 
         setText('referral-link', link || 'Your referral link will appear after your profile is ready.');
