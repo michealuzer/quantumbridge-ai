@@ -104,10 +104,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentDynamicStyles.push(newStyle);
             });
 
-            document.body.className = `${doc.body.className} overflow-hidden m-0 p-0 w-screen h-screen flex relative`;
+            document.body.className = `${doc.body.className} overflow-hidden m-0 p-0 w-screen h-[100dvh] flex relative`;
 
             setTimeout(() => {
-                container.innerHTML = `<div class="w-full h-full relative" id="injected-view">${doc.body.innerHTML}</div>`;
+                container.innerHTML = `<div class="w-full relative" id="injected-view">${doc.body.innerHTML}</div>`;
                 container.appendChild(loadingState);
                 interceptLinks();
                 bindAuthForms();
@@ -168,6 +168,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         view.querySelectorAll('a, button').forEach(el => {
             el.addEventListener('click', (event) => {
                 if (el.tagName.toLowerCase() === 'button' && el.getAttribute('type') === 'submit') return;
+                
+                // Prevent intercepting "Copy" buttons
+                if (el.id && el.id.includes('copy')) return;
 
                 const text = el.innerText.toLowerCase().trim();
                 const href = el.getAttribute('href');
