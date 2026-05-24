@@ -1,0 +1,150 @@
+<style>
+    .qt-grid-bg {
+        background-image:
+            linear-gradient(rgba(0, 109, 50, 0.07) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 97, 164, 0.05) 1px, transparent 1px);
+        background-size: 34px 34px;
+        mask-image: linear-gradient(to bottom, black 0%, black 70%, transparent 100%);
+    }
+
+    .qt-scanline {
+        background: linear-gradient(90deg, transparent, rgba(0, 209, 102, 0.34), transparent);
+        animation: qtScan 4.5s ease-in-out infinite;
+    }
+
+    .qt-rise-1 { animation: qtRise 3.6s ease-in-out infinite; }
+    .qt-rise-2 { animation: qtRise 4.2s ease-in-out infinite; }
+    .qt-rise-3 { animation: qtRise 3.9s ease-in-out infinite; }
+
+    @keyframes qtScan {
+        0%, 100% { transform: translateX(-70%); opacity: 0; }
+        20%, 70% { opacity: 1; }
+        100% { transform: translateX(70%); opacity: 0; }
+    }
+
+    @keyframes qtRise {
+        0%, 100% { transform: scaleY(0.82); opacity: 0.76; }
+        50% { transform: scaleY(1); opacity: 1; }
+    }
+</style>
+
+<div class="min-h-screen bg-[#f6f8fb] text-on-surface overflow-hidden">
+    <section class="relative px-5 pt-20 pb-16 md:px-10 md:pt-28 md:pb-20">
+        <div class="qt-grid-bg absolute inset-0 pointer-events-none"></div>
+        <div class="absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-white via-white/90 to-transparent pointer-events-none"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto">
+            <div class="relative z-10 max-w-4xl mx-auto w-full flex flex-col items-center">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-outline-variant/40 shadow-sm mb-5">
+                <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                <span class="text-[10px] font-bold uppercase tracking-widest text-primary">Bridge Loan plans now open</span>
+            </div>
+
+            <h1 class="font-display text-[42px] leading-[44px] md:text-[70px] md:leading-[72px] font-bold mb-6 max-w-3xl text-center">
+                Put your Capital to work every day
+            </h1>
+
+            <p class="font-body text-base md:text-xl text-on-surface/66 max-w-2xl leading-8 mb-5 text-center">
+                QuantumBridge gives investors a clear place to start, track, and manage real-estate bridge loan funds. Choose a fund, track daily interest accruals, and manage your private debt portfolio securely in one dashboard.
+            </p>
+
+            <div class="flex flex-wrap justify-center gap-2 mb-7">
+                <span class="px-3 py-2 rounded-full bg-white border border-outline-variant/35 text-xs font-bold text-on-surface/65 shadow-sm">Plans from $10</span>
+                <span class="px-3 py-2 rounded-full bg-white border border-outline-variant/35 text-xs font-bold text-on-surface/65 shadow-sm">Daily dashboard updates</span>
+                <span class="px-3 py-2 rounded-full bg-white border border-outline-variant/35 text-xs font-bold text-on-surface/65 shadow-sm">Private user funds</span>
+            </div>
+
+            <div class="flex flex-col sm:flex-row justify-center gap-3 mb-7 w-full sm:w-auto">
+                <a href="#/signup" class="inline-flex items-center justify-center gap-2 px-6 py-4 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:bg-primary-container transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">account_balance</span>
+                    Get Early Access
+                </a>
+                <a href="#/explorer" class="inline-flex items-center justify-center gap-2 px-6 py-4 bg-white text-on-surface rounded-lg font-bold border border-outline-variant/40 shadow-sm hover:bg-surface-container-low transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">payments</span>
+                    Compare Funds
+                </a>
+                <a href="#/login" class="inline-flex items-center justify-center gap-2 px-6 py-4 bg-on-surface text-white rounded-lg font-bold shadow-lg shadow-on-surface/10 hover:bg-on-surface/90 transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">login</span>
+                    Login
+                </a>
+            </div>
+
+            <div class="grid grid-cols-3 gap-3 max-w-2xl w-full">
+                <div class="bg-white/90 border border-outline-variant/35 rounded-lg p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Starter Fund</p>
+                    <p class="font-display text-2xl md:text-3xl font-bold text-primary mt-1">3%</p>
+                    <p class="text-xs text-on-surface/50 mt-1">daily yield</p>
+                </div>
+                <div class="bg-white/90 border border-outline-variant/35 rounded-lg p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Visibility</p>
+                    <p class="font-display text-2xl md:text-3xl font-bold mt-1">24/7</p>
+                    <p class="text-xs text-on-surface/50 mt-1">account access</p>
+                </div>
+                <div class="bg-white/90 border border-outline-variant/35 rounded-lg p-4 shadow-sm text-center">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Term</p>
+                    <p class="font-display text-2xl md:text-3xl font-bold mt-1">14-120</p>
+                    <p class="text-xs text-on-surface/50 mt-1">day options</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="px-5 pb-8 md:px-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <span class="material-symbols-outlined text-primary text-3xl mb-4">trending_up</span>
+                    <h3 class="font-display text-xl font-bold mb-2">Choose a plan that fits</h3>
+                    <p class="text-on-surface/60 leading-6">Start with a short 14-day option, grow into a 60-day plan, or review larger allocations when your balance is ready.</p>
+                </article>
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <span class="material-symbols-outlined text-primary text-3xl mb-4">query_stats</span>
+                    <h3 class="font-display text-xl font-bold mb-2">See what is happening</h3>
+                    <p class="text-on-surface/60 leading-6">Your account dashboard shows funds, daily yields, plan status, project activity, and projected returns without digging through menus.</p>
+                </article>
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <span class="material-symbols-outlined text-primary text-3xl mb-4">verified_user</span>
+                    <h3 class="font-display text-xl font-bold mb-2">Built around private access</h3>
+                    <p class="text-on-surface/60 leading-6">Each user account is protected by authentication and backend access rules, so dashboard funds stay tied to the right investor.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="px-5 pb-28 md:px-10">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+            <div class="lg:col-span-5 bg-on-surface text-white rounded-xl p-7 md:p-8 shadow-xl shadow-on-surface/10">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-white/45 mb-4">Why investors stay</p>
+                <h2 class="font-display text-3xl md:text-4xl font-bold leading-tight mb-4">You are not guessing after signup.</h2>
+                <p class="text-white/70 leading-7 mb-6">The moment your account is active, QuantumBridge organizes the pieces investors care about most: selected plan, account funds, daily yield history, project records, and withdrawal path.</p>
+                <a href="#/signup" class="inline-flex items-center justify-center gap-2 px-5 py-3 bg-primary text-white rounded-lg font-bold">
+                    <span class="material-symbols-outlined text-[20px]">person_add</span>
+                    Open Your Account
+                </a>
+            </div>
+
+            <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Plans</p>
+                    <h3 class="font-display text-3xl font-bold mt-2">6 options</h3>
+                    <p class="text-on-surface/60 leading-6 mt-3">From starter plans to higher-balance private allocations.</p>
+                </article>
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Starter Fund daily yield</p>
+                    <h3 class="font-display text-3xl font-bold text-primary mt-2">3%</h3>
+                    <p class="text-on-surface/60 leading-6 mt-3">Presented clearly in the account dashboard for the selected plan.</p>
+                </article>
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Project activity</p>
+                    <h3 class="font-display text-3xl font-bold mt-2">In account</h3>
+                    <p class="text-on-surface/60 leading-6 mt-3">Project history belongs beside funds, so investors see context fast.</p>
+                </article>
+                <article class="bg-white rounded-lg p-6 border border-outline-variant/30 shadow-sm">
+                    <p class="text-[10px] font-bold uppercase text-on-surface/42">Security</p>
+                    <h3 class="font-display text-3xl font-bold mt-2">RLS backed</h3>
+                    <p class="text-on-surface/60 leading-6 mt-3">Backend policies keep user dashboard data scoped to its owner.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+</div>

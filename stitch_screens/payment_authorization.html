@@ -1,0 +1,54 @@
+<div class="min-h-screen bg-surface p-6 pb-32 md:p-12 md:pb-28 max-w-6xl mx-auto">
+    <header class="mb-8">
+        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Secure Payment</span>
+        <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight mt-3">Authorize Your Investment</h1>
+        <p class="font-body text-on-surface/60 mt-3 max-w-2xl">QuantumBridge prepared your order. Complete the final mobile money or card authorization in the secure window below.</p>
+    </header>
+
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <aside class="lg:col-span-4 bg-on-surface text-white rounded-[2rem] p-7 md:p-8 shadow-xl shadow-on-surface/10">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-white/45">Payment Status</span>
+            <h2 id="payment-status-title" class="font-display text-3xl font-bold mt-3">Waiting for authorization</h2>
+            <p id="payment-status-copy" class="text-white/68 leading-7 mt-4">If you chose mobile money, approve the prompt on your phone, then tap the Pesapal proceed button. We will update your dashboard after Pesapal confirms the payment.</p>
+
+            <div class="mt-7 space-y-3 text-sm">
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary-container">check_circle</span>
+                    <span>Order created by QuantumBridge</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary-container">lock</span>
+                    <span>PIN and card details stay with Pesapal</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="material-symbols-outlined text-primary-container">sync</span>
+                    <span>Dashboard updates after confirmation</span>
+                </div>
+            </div>
+
+            <button id="payment-status-refresh" class="w-full mt-8 py-3 rounded-xl bg-primary text-white font-bold">Check Status</button>
+            <a href="#/onboarding" class="block text-center mt-3 py-3 rounded-xl bg-white/10 text-white font-bold">Start Over</a>
+            <p id="payment-auth-message" class="min-h-5 mt-4 text-sm font-semibold text-white/65"></p>
+        </aside>
+
+        <div class="lg:col-span-8 bg-white rounded-[2rem] border border-outline-variant/30 shadow-xl shadow-secondary/10 overflow-hidden">
+            <div class="flex items-center justify-between gap-4 p-4 border-b border-outline-variant/30">
+                <div>
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Pesapal Secure Authorization</p>
+                    <p id="payment-order-id" class="font-body text-sm text-on-surface/60 mt-1">Loading order...</p>
+                </div>
+                <a id="payment-open-new" href="#" target="_blank" rel="noreferrer" class="px-4 py-2 rounded-xl bg-surface-container-low text-primary font-bold text-sm">Open</a>
+            </div>
+
+            <div class="relative bg-surface-container-low min-h-[620px]">
+                <div id="payment-missing" class="hidden absolute inset-0 p-8 flex flex-col items-center justify-center text-center">
+                    <span class="material-symbols-outlined text-primary text-5xl">payments</span>
+                    <h2 class="font-display text-2xl font-bold mt-4">No active payment session</h2>
+                    <p class="text-on-surface/60 mt-2 max-w-md">Start a new investment payment so QuantumBridge can prepare a secure Pesapal authorization session.</p>
+                    <a href="#/onboarding" class="mt-6 px-5 py-3 bg-primary text-white rounded-xl font-bold">Create Payment</a>
+                </div>
+                <iframe id="payment-frame" title="Pesapal secure payment authorization" class="w-full h-[720px] bg-white border-0"></iframe>
+            </div>
+        </div>
+    </section>
+</div>

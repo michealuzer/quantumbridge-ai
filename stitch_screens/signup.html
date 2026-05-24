@@ -1,0 +1,43 @@
+<div class="min-h-screen bg-surface p-6 pb-36 md:p-12 md:pb-28 flex items-center justify-center">
+    <section class="w-full max-w-md">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 border border-primary/10 mb-5">
+                <span class="w-2 h-2 rounded-full bg-primary"></span>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Investor Account</span>
+            </div>
+            <h1 class="font-display text-4xl md:text-5xl font-bold tracking-tight">Create account</h1>
+            <p class="text-on-surface/60 mt-3">Start with email and password. Investment details come after login.</p>
+        </div>
+
+        <form id="signup-form" class="bg-white/85 backdrop-blur-xl rounded-[2rem] border border-outline-variant/40 shadow-2xl shadow-primary/10 p-6 md:p-8 flex flex-col gap-5">
+            <div class="rounded-xl bg-surface-container-low border border-outline-variant/30 p-4 hidden" data-auth-config-warning>
+                <p class="text-sm font-semibold text-on-surface">Supabase keys are not configured yet.</p>
+                <p class="text-xs text-on-surface/60 mt-1">Replace placeholders in auth-config.js to enable real signup.</p>
+            </div>
+
+            <label class="flex flex-col gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Email</span>
+                <input name="email" type="email" autocomplete="email" required class="rounded-xl border-outline-variant/50 bg-surface-container-low px-4 py-3 font-body focus:border-primary focus:ring-primary" placeholder="you@example.com">
+            </label>
+
+            <label class="flex flex-col gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Password</span>
+                <input name="password" type="password" autocomplete="new-password" required minlength="6" class="rounded-xl border-outline-variant/50 bg-surface-container-low px-4 py-3 font-body focus:border-primary focus:ring-primary" placeholder="Minimum 6 characters">
+            </label>
+
+            <label class="flex flex-col gap-2">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Confirm password</span>
+                <input name="confirmPassword" type="password" autocomplete="new-password" required minlength="6" class="rounded-xl border-outline-variant/50 bg-surface-container-low px-4 py-3 font-body focus:border-primary focus:ring-primary" placeholder="Repeat password">
+            </label>
+
+            <div class="min-h-5 text-sm font-semibold" data-auth-message></div>
+
+            <button type="submit" class="auth-submit inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-4 font-bold text-white shadow-lg shadow-primary/20">
+                <span class="material-symbols-outlined text-[20px]">person_add</span>
+                Create account
+            </button>
+
+            <p class="text-center text-sm text-on-surface/55">Already have an account? <a href="#/login" class="font-bold text-primary">Log in</a></p>
+        </form>
+    </section>
+</div>

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quantum AI - Strategy Comparison</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"surface-container-lowest": "#ffffff", "surface-bright": "#fdfbff", primary: "#005224", "surface-variant": "#dfe4dc", "on-error-container": "#93000a", "surface-dim": "#d7dbd3", outline: "#6f7a6e", "on-tertiary-container": "#ffcbd1", "surface-container": "#ebefe7", "on-error": "#ffffff", "on-primary-fixed": "#00210b", "on-secondary-fixed": "#001d36", "primary-container": "#006d32", "primary-fixed": "#9bf7ac", "outline-variant": "#becabc", tertiary: "#7e2739", "on-primary-container": "#91eca2", "secondary-fixed-dim": "#9fcaff", "surface-container-high": "#e5eae1", secondary: "#0061a4", "error-container": "#ffdad6", "on-surface-variant": "#3f493f", "on-primary-fixed-variant": "#005224", "on-secondary-fixed-variant": "#00497d", "on-secondary": "#ffffff", "tertiary-fixed": "#ffd9dd", "secondary-fixed": "#d1e4ff", "inverse-surface": "#2d322c", "tertiary-container": "#9d3e50", "on-surface": "#181d18", "secondary-container": "#77b7ff", "tertiary-fixed-dim": "#ffb2bb", surface: "#f8f9ff", "surface-container-low": "#eff4ff", "inverse-on-surface": "#edf2ea", error: "#ba1a1a", "surface-tint": "#016d32", "on-tertiary": "#ffffff", "on-secondary-container": "#00477b", "inverse-primary": "#7fda92", "on-tertiary-fixed-variant": "#7f273a", "on-tertiary-fixed": "#400012", "on-primary": "#ffffff", "on-background": "#181d18", "surface-container-highest": "#dfe4dc", background: "#f6fbf2", "primary-fixed-dim": "#7fda92"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {xs: "8px", gutter: "1.5rem", md: "16px", lg: "24px", "margin-mobile": "1rem", sm: "12px", xl: "32px", base: "4px", "margin-desktop": "2.5rem", "space-8": "2rem", "space-10": "2.5rem", "space-4": "1rem"}, fontFamily: {"headline-lg": ["Space Grotesk"], "title-md": ["Inter"], "body-md": ["Inter"], "headline-lg-mobile": ["Space Grotesk"], "data-tabular": ["JetBrains Mono"], "label-caps": ["Inter"], "display-lg": ["Space Grotesk"], "body-sm": ["Inter"], "headline-sm": ["Space Grotesk"], "label-md": ["Inter"], "body-lg": ["Inter"], "title-lg": ["Inter"]}, fontSize: {"headline-lg": ["32px", {lineHeight: "40px", fontWeight: "600"}], "title-md": ["18px", {lineHeight: "24px", fontWeight: "600"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "600"}], "data-tabular": ["14px", {lineHeight: "20px", fontWeight: "500"}], "label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700"}], "display-lg": ["57px", {lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "700"}], "body-sm": ["12px", {lineHeight: "16px", fontWeight: "400"}], "headline-sm": ["24px", {lineHeight: "32px", fontWeight: "500"}], "label-md": ["12px", {lineHeight: "16px", letterSpacing: "0.5px", fontWeight: "500"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "title-lg": ["22px", {lineHeight: "28px", fontWeight: "500"}]}}}};</script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+        .glass-active {
+            background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(30, 41, 59, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(137, 206, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(137, 206, 255, 0.15);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen flex flex-col pt-16 pb-20">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 border-b border-outline-variant/10 shadow-sm bg-surface/80 dark:bg-surface/80 backdrop-blur-xl">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full">
+<div class="flex items-center gap-md">
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-outline-variant/30" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeHsUthzJjNC3dwGxOPiuolfjuGzdOOeZSYYIfeO8lY-cyQwJ9E9SaQxFRX9VICpaAGWvIMrwESiNONw1FRAyuLA2Wi-Mc04PX_cFsGZGOqRpu3GMztxHMZsu0xvHCgpfHU_06A-OKqYUdrhTJgWNVc51y34uP5JlFbrmBuds7hA20kkknpk4_sazeDOq8hM2XXiRuDxSJ5GvO6j_gG_IXMVeqAskteoSCcRPJHLTO3a4G7XA0fSIpY-v9ifVnGDMx9RscnjbnsmU"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-primary">QUANTUM AI</h1>
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-margin-mobile pt-lg pb-xl flex flex-col gap-lg">
+<section class="flex flex-col gap-xs">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Strategy Comparison</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Select the algorithmic approach that aligns with your risk tolerance and APY goals.</p>
+</section>
+<!-- Strategy Cards -->
+<div class="flex flex-col gap-md">
+<!-- Standard Strategy -->
+<article class="glass-card rounded-xl p-md flex flex-col gap-md relative overflow-hidden">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Standard</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Trend Following</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-sm border-t border-outline-variant/10">
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Target APY</span>
+<span class="font-data-tabular text-data-tabular text-tertiary">8% - 12%</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Level</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">Low - Med</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Min Investment</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">$10</span>
+</div>
+</div>
+<button class="mt-xs w-full py-sm rounded-lg border border-secondary text-secondary font-title-md text-title-md text-center active:scale-95 transition-transform">Select Standard</button>
+</article>
+<!-- Professional Strategy (Active/Best Value) -->
+<article class="glass-active rounded-xl p-md flex flex-col gap-md relative overflow-hidden">
+<div class="absolute top-0 right-0 bg-secondary px-sm py-base rounded-bl-lg">
+<span class="font-label-caps text-label-caps text-on-secondary uppercase">Best Value</span>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-secondary">Professional</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Arbitrage &amp; Sentiment</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-sm border-t border-outline-variant/10">
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Target APY</span>
+<span class="font-data-tabular text-data-tabular text-tertiary">15% - 25%</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Level</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">Medium</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Min Investment</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">$100</span>
+</div>
+</div>
+<button class="mt-xs w-full py-sm rounded-lg bg-secondary text-on-secondary font-title-md text-title-md text-center active:scale-95 transition-transform shadow-[0_0_15px_rgba(137,206,255,0.2)]">Active Strategy</button>
+</article>
+<!-- Elite Strategy -->
+<article class="glass-card rounded-xl p-md flex flex-col gap-md relative overflow-hidden border-l-2 border-l-[#a855f7]">
+<div class="absolute top-0 right-0 bg-[#a855f7]/20 border border-[#a855f7]/30 px-sm py-base rounded-bl-lg">
+<span class="font-label-caps text-label-caps text-[#d8b4fe] uppercase">High Performance</span>
+</div>
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-title-md text-title-md text-on-surface">Elite</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">High-Frequency Quantum</p>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-sm pt-sm border-t border-outline-variant/10">
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Target APY</span>
+<span class="font-data-tabular text-data-tabular text-tertiary">30%+</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Level</span>
+<span class="font-data-tabular text-data-tabular text-error">High</span>
+</div>
+<div class="flex flex-col gap-base">
+<span class="font-label-caps text-label-caps text-on-surface-variant uppercase">Min Investment</span>
+<span class="font-data-tabular text-data-tabular text-on-surface">$500</span>
+</div>
+</div>
+<button class="mt-xs w-full py-sm rounded-lg border border-secondary text-secondary font-title-md text-title-md text-center active:scale-95 transition-transform">Select Elite</button>
+</article>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/10 shadow-[0_-4px_20px_rgba(0,162,230,0.05)] bg-surface-container/80 dark:bg-surface-container/80 backdrop-blur-xl md:hidden">
+<div class="flex justify-around items-center h-20 px-margin-mobile w-full pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant gap-1 hover:text-secondary/80 transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary gap-1 hover:text-secondary/80 transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant gap-1 hover:text-secondary/80 transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">swap_horiz</span>
+<span class="font-label-caps text-label-caps">Projects</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant gap-1 hover:text-secondary/80 transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">pie_chart</span>
+<span class="font-label-caps text-label-caps">Portfolio</span>
+</a>
+</div>
+</nav>
+</body></html>

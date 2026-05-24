@@ -1,0 +1,83 @@
+<div class="min-h-screen bg-transparent p-6 pb-32 md:p-12 md:pb-28 max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-12">
+        <div>
+            <h1 class="font-display text-4xl font-bold tracking-tight text-on-surface">Account Overview</h1>
+            <p id="dashboard-investor-code" class="font-body text-on-surface/40 font-semibold uppercase tracking-widest text-[10px] mt-1">QuantumBridge Investor</p>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="text-right hidden md:block">
+                <p id="dashboard-display-name" class="font-body font-bold text-sm">QuantumBridge Client</p>
+                <p id="dashboard-plan-name" class="font-body text-xs text-on-surface/40">Loading account...</p>
+            </div>
+            <button data-logout class="w-12 h-12 rounded-2xl bg-surface-container border border-outline-variant/30 flex items-center justify-center text-on-surface/50 hover:text-primary transition-colors" title="Log out">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+            <div class="w-12 h-12 rounded-2xl bg-surface-container overflow-hidden border border-outline-variant/30">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjVctF_Jnl7NFthZu4ploDE1wpbQRIz3FdNQ28vj2BpRSeBwnpDucQomM364Ge2yXuC65Gpv_D_kvWbl9MTJ-avWNKEpPDwWrtDIDM9qAcpAJhkZvcyWoYVrZ2SPGqoI7VfQ9wLrcfg_2CdFjsea8E-1d5IB7_nCneUG5EbZ83eTFMgHDRypdbJwCCFHLw6PWwnFphMIFCf8BghX0XVCY9omMA-vLO-IQGxGYlBM79byFOOrnKIJCaJycbbxn1eGs-5iNMF0Af28s" class="w-full h-full object-cover">
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Balance Card - Large Tonal Shift -->
+    <section class="bg-primary text-white p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-primary/20 mb-12 relative overflow-hidden group">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/20 rounded-full -mr-20 -mt-20 blur-3xl animate-pulse"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
+            <div class="flex flex-col gap-2">
+                <span class="text-xs font-bold uppercase tracking-[0.2em] opacity-60">Active Investment</span>
+                <span id="dashboard-principal" class="font-display text-5xl md:text-7xl font-bold tracking-tighter">$0.00</span>
+                <div class="flex items-center gap-2 mt-2">
+                    <span id="dashboard-daily-percent" class="px-2 py-1 rounded-full bg-white/10 text-[10px] font-bold">Loading plan</span>
+                    <span id="dashboard-day" class="text-[10px] opacity-60">Day 0 of 0</span>
+                </div>
+            </div>
+            <div class="flex gap-4 md:gap-8 bg-white/5 backdrop-blur-md p-6 rounded-3xl border border-white/10">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Today's Credit</span>
+                    <span id="dashboard-daily-credit" class="text-2xl font-display font-bold">+$0.00</span>
+                </div>
+                <div class="w-px bg-white/10"></div>
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-40">Projected Yield</span>
+                    <span id="dashboard-projected-return" class="text-2xl font-display font-bold">$0</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+        <!-- Chart Section -->
+        <div class="md:col-span-8 bg-surface-container-low rounded-[2rem] p-8">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="font-display text-xl font-bold">60-Day Yield Schedule</h3>
+                <div class="flex gap-1 bg-surface-container p-1 rounded-xl">
+                    <button class="px-4 py-1.5 rounded-lg text-xs font-bold bg-white shadow-sm text-primary">1W</button>
+                    <button class="px-4 py-1.5 rounded-lg text-xs font-bold text-on-surface/40 hover:text-on-surface">1M</button>
+                    <button class="px-4 py-1.5 rounded-lg text-xs font-bold text-on-surface/40 hover:text-on-surface">ALL</button>
+                </div>
+            </div>
+            <!-- Animated Chart -->
+            <div class="h-64 w-full flex items-end gap-2 px-2 overflow-hidden">
+                <div class="flex-1 h-[34%] rounded-t-lg bg-primary/10 origin-bottom qt-rise-1"></div>
+                <div class="flex-1 h-[48%] rounded-t-lg bg-primary/10 origin-bottom qt-rise-2"></div>
+                <div class="flex-1 h-[44%] rounded-t-lg bg-primary/10 origin-bottom qt-rise-3"></div>
+                <div class="flex-1 h-[62%] rounded-t-lg bg-primary/20 origin-bottom qt-rise-1"></div>
+                <div class="flex-1 h-[74%] rounded-t-lg bg-primary/30 origin-bottom qt-rise-2"></div>
+                <div class="flex-1 h-[92%] rounded-t-lg bg-primary origin-bottom qt-rise-3"></div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="md:col-span-4 flex flex-col gap-6">
+            <div class="flex justify-between items-center px-2">
+                <h3 class="font-display text-xl font-bold">Recent Projects Funded</h3>
+                <a href="#/history" class="text-[10px] font-bold uppercase tracking-widest text-primary hover:underline">View All</a>
+            </div>
+            
+            <div id="dashboard-projects" class="flex flex-col gap-4">
+                <div class="bg-surface-container p-4 rounded-2xl text-sm text-on-surface/50">Loading your projects...</div>
+            </div>
+        </div>
+    </div>
+</div>

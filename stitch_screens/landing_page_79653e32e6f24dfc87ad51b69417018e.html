@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quantum AI - Synthetic Intelligence Trading</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400;600;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-container": "#00a2e6",
+                      "secondary-fixed-dim": "#89ceff",
+                      "on-tertiary-container": "#009365",
+                      "on-tertiary-fixed-variant": "#005236",
+                      "on-primary-fixed": "#131b2e",
+                      "primary": "#bec6e0",
+                      "on-secondary-fixed-variant": "#004c6e",
+                      "on-primary-container": "#798098",
+                      "on-primary": "#283044",
+                      "on-background": "#d3e4fe",
+                      "surface-tint": "#bec6e0",
+                      "surface-container-highest": "#26364a",
+                      "on-surface-variant": "#c6c6cd",
+                      "primary-fixed": "#dae2fd",
+                      "on-tertiary": "#003824",
+                      "surface-container-high": "#1b2b3f",
+                      "on-surface": "#d3e4fe",
+                      "on-secondary": "#00344d",
+                      "primary-fixed-dim": "#bec6e0",
+                      "outline-variant": "#45464d",
+                      "inverse-on-surface": "#213145",
+                      "surface-container-lowest": "#000f21",
+                      "on-error": "#690005",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "on-tertiary-fixed": "#002113",
+                      "tertiary-fixed": "#6ffbbe",
+                      "error": "#ffb4ab",
+                      "tertiary-container": "#001c10",
+                      "surface-container-low": "#0b1c30",
+                      "inverse-surface": "#d3e4fe",
+                      "outline": "#909097",
+                      "error-container": "#93000a",
+                      "background": "#031427",
+                      "on-secondary-container": "#00344e",
+                      "surface-dim": "#031427",
+                      "secondary-fixed": "#c9e6ff",
+                      "on-error-container": "#ffdad6",
+                      "tertiary-fixed-dim": "#4edea3",
+                      "surface-variant": "#26364a",
+                      "primary-container": "#0f172a",
+                      "inverse-primary": "#565e74",
+                      "tertiary": "#4edea3",
+                      "surface-bright": "#2a3a4f",
+                      "on-secondary-fixed": "#001e2f",
+                      "secondary": "#89ceff",
+                      "surface-container": "#102034",
+                      "surface": "#031427"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "xl": "32px",
+                      "margin-mobile": "16px",
+                      "xs": "8px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "margin-desktop": "40px",
+                      "md": "16px",
+                      "gutter": "24px",
+                      "sm": "12px"
+              },
+              "fontFamily": {
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "data-tabular": [
+                              "JetBrains Mono"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "title-md": [
+                              "18px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "24px",
+                              {
+                                      "lineHeight": "32px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "data-tabular": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-layer {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 100%), var(--tw-colors-surface-variant);
+            backdrop-filter: blur(20px);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md text-body-md antialiased min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky backdrop-blur-xl bg-surface/80 border-b border-outline-variant/10 shadow-sm flex justify-between items-center w-full px-margin-mobile h-16 z-50">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant/20 overflow-hidden flex-shrink-0">
+<img alt="User Avatar" class="w-full h-full object-cover" data-alt="A futuristic avatar placeholder image with a glowing neon blue accent, indicating an active AI trading profile against a dark background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHJT6gyQE1r3U03KK1TH2NYw6rfgc1ywpGu84tpctodYbN5o1nLB35dhlEl9f6wnrkx9QAMwVmdK2UqgxRW74fp-YShlAVrFgKsM3LrgClruHg0nz9EJYKNc6W-oBmNHxesM_0yewtyiArLsdFlCfC3Cw1H1tliIz5QQ9n6B02KU4b3wU2SMWDWq4xvj7u-UhLKmQ-fAyNgNuXeZL-ayxi2CYVmhl3fTR5Z2XMckZ988Nx9-7EeVgYGVd4_MOPsl8jreO_lDWa6jE"/>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tighter text-on-surface">QUANTUM AI</h1>
+</div>
+<button aria-label="Notifications" class="hover:opacity-80 transition-opacity active:scale-95 text-secondary flex items-center justify-center w-10 h-10 rounded-full">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-margin-mobile pt-lg pb-[100px] flex flex-col gap-xl">
+<!-- Hero Section -->
+<section class="relative pt-md pb-lg flex flex-col items-center text-center">
+<!-- Background subtle glow -->
+<div class="absolute inset-0 bg-secondary-container/10 blur-[60px] rounded-full w-[200px] h-[200px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tight text-on-surface z-10 mb-md relative">
+                AI-Driven Trading.<br/>Institutional Returns.
+            </h2>
+<p class="font-body-md text-body-md text-on-surface-variant z-10 mb-xl max-w-[300px]">
+                Our proprietary algorithms project 24/7 so you don't have to. Invest, track, and profit.
+            </p>
+<button class="w-full bg-secondary-container text-white font-label-caps text-label-caps py-md rounded-lg shadow-[0_4px_20px_rgba(0,162,230,0.25)] hover:bg-secondary-fixed-dim transition-colors active:scale-95 relative overflow-hidden group z-10">
+<span class="relative z-10">Get Started</span>
+<div class="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+</button>
+</section>
+<!-- Trust Section -->
+<section class="flex flex-col items-center gap-md border-t border-b border-outline-variant/10 py-md">
+<p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Trusted by 50,000+ investors</p>
+<div class="flex gap-lg items-center justify-center opacity-60">
+<span class="material-symbols-outlined text-[32px]">account_balance</span>
+<span class="material-symbols-outlined text-[32px]">domain</span>
+<span class="material-symbols-outlined text-[32px]">candlestick_chart</span>
+</div>
+</section>
+<!-- Features Bento -->
+<section class="grid grid-cols-1 gap-sm">
+<!-- Feature 1 -->
+<div class="glass-layer bg-surface-container-high border border-outline-variant/20 rounded-xl p-md relative overflow-hidden flex flex-col gap-xs">
+<div class="absolute top-0 left-0 w-1 h-full bg-secondary-container rounded-l-xl"></div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-secondary">memory</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface">Secured Execution</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Lightning-fast project execution powered by quantum-inspired neural networks.</p>
+</div>
+<!-- Feature 2 -->
+<div class="glass-layer bg-surface-container-high border border-outline-variant/20 rounded-xl p-md relative flex flex-col gap-xs">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-secondary">visibility</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface">Real-time Transparency</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Live order book tracking and execution routing visualizer.</p>
+</div>
+<!-- Feature 3 -->
+<div class="glass-layer bg-surface-container-high border border-outline-variant/20 rounded-xl p-md relative flex flex-col gap-xs">
+<div class="absolute top-0 left-0 w-1 h-full bg-tertiary rounded-l-xl"></div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center mb-xs">
+<span class="material-symbols-outlined text-tertiary">shield</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface">Risk Management</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Dynamic stop-loss logic and portfolio volatility stabilization.</p>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="docked full-width bottom-0 fixed rounded-t-xl bg-surface-container/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-[0_-4px_20px_rgba(137,206,255,0.1)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2">
+<a class="flex flex-col items-center justify-center bg-secondary-container/20 text-secondary rounded-xl px-4 py-1.5 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-secondary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+<span class="font-label-caps text-label-caps">Dashboard</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-secondary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 0;">insights</span>
+<span class="font-label-caps text-label-caps">Projects</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-secondary transition-colors active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mb-1 text-[24px]" style="font-variation-settings: 'FILL' 0;">account_balance_wallet</span>
+<span class="font-label-caps text-label-caps">Portfolio</span>
+</a>
+</nav>
+</body></html>

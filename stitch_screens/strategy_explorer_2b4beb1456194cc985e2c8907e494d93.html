@@ -1,0 +1,89 @@
+<div class="min-h-screen bg-surface p-6 pb-32 md:p-12 md:pb-28 max-w-7xl mx-auto">
+    <header class="mb-10">
+        <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Investment Plans</span>
+        <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight mt-3">Choose an Investment Fund</h1>
+        <p class="font-body text-on-surface/60 mt-3 max-w-2xl">Plans are loaded from Supabase. Your account dashboard only shows investments and projects linked to your authenticated user.</p>
+    </header>
+
+    <!-- Yield Calculator -->
+    <section class="glass-panel rounded-[2rem] p-8 mb-8 border border-outline-variant/30 shadow-xl shadow-secondary/5 relative overflow-hidden">
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl pointer-events-none"></div>
+        <h2 class="font-display text-2xl font-bold mb-2 flex items-center gap-2">
+            <span class="material-symbols-outlined text-primary">calculate</span>
+            Yield Calculator
+        </h2>
+        <p class="text-sm text-on-surface/60 mb-6">Estimate your potential returns based on the selected plan.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
+            <div class="md:col-span-4 flex flex-col gap-4">
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 mb-2 block">Calculator Amount ($)</label>
+                    <input type="number" id="calc-amount" value="10" min="10" class="w-full bg-white/50 border border-outline-variant/40 rounded-xl px-4 py-3 font-display text-2xl font-bold focus:ring-2 focus:ring-primary/50 outline-none transition-all">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40 mb-2 block">Select Plan</label>
+                    <select id="calc-plan" class="w-full bg-white/50 border border-outline-variant/40 rounded-xl px-4 py-3 font-body text-base focus:ring-2 focus:ring-primary/50 outline-none transition-all">
+                        <option value="3,60">Starter Fund (3% Daily / 60 Days)</option>
+                        <option value="5,90">Residential Fund (5% Daily / 90 Days)</option>
+                        <option value="10,120">Commercial Fund (10% Daily / 120 Days)</option>
+                        <option value="15,180">Development Fund (15% Daily / 180 Days)</option>
+                    </select>
+                </div>
+                <label class="flex items-center justify-between gap-4 rounded-xl border border-outline-variant/30 bg-white/50 px-4 py-3 cursor-pointer">
+                    <span>
+                        <span class="block text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Compounding</span>
+                        <span class="block text-sm font-semibold text-on-surface/70 mt-1">Reinvest daily yield</span>
+                    </span>
+                    <input id="calc-compound" type="checkbox" class="rounded border-outline-variant text-primary focus:ring-primary">
+                </label>
+                <div id="calc-lock-note" class="rounded-xl bg-primary/10 border border-primary/15 px-4 py-3 text-sm text-on-surface/70 leading-6">
+                    Standard mode keeps profits flexible: your daily profit can be withdrawn while the plan remains active.
+                </div>
+            </div>
+            
+            <div class="md:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="bg-white/60 backdrop-blur-md rounded-2xl p-6 border border-outline-variant/20">
+                    <p id="calc-return-label" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/50 mb-1">Estimated Daily Yield</p>
+                    <p id="calc-daily-return" class="font-display text-4xl font-bold text-primary">+$30.00</p>
+                </div>
+                <div class="bg-primary/90 text-white backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-lg shadow-primary/20">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/60 mb-1">Estimated Profit</p>
+                    <p id="calc-total-return" class="font-display text-4xl font-bold">+$1,800.00</p>
+                </div>
+                <div class="bg-on-surface text-white backdrop-blur-md rounded-2xl p-6 border border-white/10">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-1">Final Balance</p>
+                    <p id="calc-final-balance" class="font-display text-4xl font-bold">$2,800.00</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="bg-on-surface text-white rounded-[2rem] p-6 md:p-8 mb-8 grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-center overflow-hidden relative">
+        <div class="absolute -right-24 -bottom-24 w-72 h-72 rounded-full bg-primary/25 blur-3xl pointer-events-none"></div>
+        <div class="relative">
+            <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/45">Confirmed Funds</span>
+            <h2 class="font-display text-3xl md:text-4xl font-bold mt-2">Available Account Balance</h2>
+            <p class="text-white/62 mt-3 max-w-2xl">Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount.</p>
+        </div>
+        <div class="relative bg-white/10 border border-white/15 rounded-2xl p-5 min-w-[240px]">
+            <p id="plans-account-balance" class="font-display text-4xl font-bold">$0.00</p>
+            <a href="#/onboarding" class="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary">Load Account</a>
+        </div>
+    </section>
+
+    <section id="plans-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 mb-8">
+        <article class="bg-white rounded-[2rem] p-8 border border-outline-variant/30 shadow-sm">
+            <span class="text-sm text-on-surface/50">Loading plans...</span>
+        </article>
+    </section>
+
+    <section class="bg-surface-container-low rounded-[2rem] p-8">
+        <h2 class="font-display text-2xl font-bold mb-6">How The Plan Works</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white rounded-2xl p-5"><p class="font-bold">1. Create Account</p><p class="text-sm text-on-surface/60 mt-2">Sign in with Supabase Auth and get your own protected profile.</p></div>
+            <div class="bg-white rounded-2xl p-5"><p class="font-bold">2. Load Account</p><p class="text-sm text-on-surface/60 mt-2">Add funds to your protected investor balance before choosing a package.</p></div>
+            <div class="bg-white rounded-2xl p-5"><p class="font-bold">3. Select Package</p><p class="text-sm text-on-surface/60 mt-2">Packages unlock according to the confirmed funds in your account.</p></div>
+            <div class="bg-white rounded-2xl p-5"><p class="font-bold">4. Withdraw Or Reinvest</p><p class="text-sm text-on-surface/60 mt-2">Move earnings to a wallet or start a new cycle.</p></div>
+        </div>
+    </section>
+</div>

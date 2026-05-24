@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Quantum AI - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"secondary-container": "#77b7ff", "secondary-fixed-dim": "#9fcaff", "on-tertiary-container": "#ffcbd1", "on-tertiary-fixed-variant": "#7f273a", "on-primary-fixed": "#00210b", primary: "#005224", "on-secondary-fixed-variant": "#00497d", "on-primary-container": "#91eca2", "on-primary": "#ffffff", "on-background": "#181d18", "surface-tint": "#016d32", "surface-container-highest": "#dfe4dc", "on-surface-variant": "#3f493f", "primary-fixed": "#9bf7ac", "on-tertiary": "#ffffff", "surface-container-high": "#e5eae1", "on-surface": "#181d18", "on-secondary": "#ffffff", "primary-fixed-dim": "#7fda92", "outline-variant": "#becabc", "inverse-on-surface": "#edf2ea", "surface-container-lowest": "#ffffff", "on-error": "#ffffff", "on-primary-fixed-variant": "#005224", "on-tertiary-fixed": "#400012", "tertiary-fixed": "#ffd9dd", error: "#ba1a1a", "tertiary-container": "#9d3e50", "surface-container-low": "#eff4ff", "inverse-surface": "#2d322c", outline: "#6f7a6e", "error-container": "#ffdad6", background: "#f6fbf2", "on-secondary-container": "#00477b", "surface-dim": "#d7dbd3", "secondary-fixed": "#d1e4ff", "on-error-container": "#93000a", "tertiary-fixed-dim": "#ffb2bb", "surface-variant": "#dfe4dc", "primary-container": "#006d32", "inverse-primary": "#7fda92", tertiary: "#7e2739", "surface-bright": "#fdfbff", "on-secondary-fixed": "#001d36", secondary: "#0061a4", "surface-container": "#ebefe7", surface: "#f8f9ff"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {xl: "32px", "margin-mobile": "1rem", xs: "8px", base: "4px", lg: "24px", "margin-desktop": "2.5rem", md: "16px", gutter: "1.5rem", sm: "12px", "space-8": "2rem", "space-10": "2.5rem", "space-4": "1rem"}, fontFamily: {"headline-lg": ["Space Grotesk"], "body-sm": ["Inter"], "title-md": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Space Grotesk"], "display-lg": ["Space Grotesk"], "data-tabular": ["JetBrains Mono"], "body-md": ["Inter"], "headline-sm": ["Space Grotesk"], "label-md": ["Inter"], "body-lg": ["Inter"], "title-lg": ["Inter"]}, fontSize: {"headline-lg": ["32px", {lineHeight: "40px", fontWeight: "600"}], "body-sm": ["12px", {lineHeight: "16px", fontWeight: "400"}], "title-md": ["18px", {lineHeight: "24px", fontWeight: "600"}], "label-caps": ["12px", {lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700"}], "headline-lg-mobile": ["28px", {lineHeight: "36px", fontWeight: "600"}], "display-lg": ["57px", {lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "700"}], "data-tabular": ["14px", {lineHeight: "20px", fontWeight: "500"}], "body-md": ["16px", {lineHeight: "24px", fontWeight: "400"}], "headline-sm": ["24px", {lineHeight: "32px", fontWeight: "500"}], "label-md": ["12px", {lineHeight: "16px", letterSpacing: "0.5px", fontWeight: "500"}], "body-lg": ["16px", {lineHeight: "24px", fontWeight: "400"}], "title-lg": ["22px", {lineHeight: "28px", fontWeight: "500"}]}}}};</script>
+<style>
+        body { background-color: theme('colors.background'); }
+        /* Subtle pulse for AI indicator */
+        @keyframes subtle-pulse {
+            0%, 100% { opacity: 0.15; }
+            50% { opacity: 0.3; }
+        }
+        .ai-pulse-bg {
+            animation: subtle-pulse 4s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="antialiased min-h-screen text-on-surface">
+<!-- TopAppBar: Transactional Mode (Suppressed Navigation Shell) -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 z-50 backdrop-blur-xl bg-surface/80 border-b border-outline-variant/10 sticky top-0 transition-all">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-start text-secondary hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold tracking-tighter text-on-surface uppercase">QUANTUM AI</div>
+<div class="w-10"></div> <!-- Spacer for center alignment -->
+</header>
+<!-- Main Content Canvas -->
+<main class="px-margin-mobile py-lg pb-[140px] flex flex-col gap-lg">
+<!-- Header Section -->
+<section>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-xs">Deploy Capital</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Review your AI strategy parameters and confirm your initial allocation.</p>
+</section>
+<!-- Selected Tier (Level 2 Elevation - Glassmorphic) -->
+<section class="relative bg-surface-variant/40 backdrop-blur-[20px] border border-white/5 border-l-4 border-l-secondary rounded-xl p-md flex flex-col gap-sm shadow-[0_4px_20px_rgba(137,206,255,0.05)] transition-transform duration-300">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label-caps text-label-caps text-secondary mb-1 block tracking-widest uppercase">Selected Strategy</span>
+<h2 class="font-title-md text-title-md text-on-surface">Professional Tier</h2>
+</div>
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary text-[18px]">memory</span>
+</div>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Algorithmic balancing across mid-cap equities and automated crypto arbitrage.</p>
+<div class="grid grid-cols-2 gap-sm mt-sm">
+<div class="bg-surface-container-lowest/50 border border-outline-variant/10 rounded-lg p-sm">
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Target Yield</div>
+<div class="font-data-tabular text-title-md text-tertiary-fixed mt-1">12.5% APY</div>
+</div>
+<div class="bg-surface-container-lowest/50 border border-outline-variant/10 rounded-lg p-sm">
+<div class="font-label-caps text-label-caps text-on-surface-variant uppercase">Risk Profile</div>
+<div class="font-data-tabular text-title-md text-on-surface mt-1">Moderate</div>
+</div>
+</div>
+</section>
+<!-- Deposit Interface Summary (Level 1 Elevation) -->
+<section class="bg-surface-container rounded-xl p-md flex flex-col gap-md border border-outline-variant/20">
+<div class="flex justify-between items-center">
+<h3 class="font-title-md text-title-md text-on-surface">Funding Details</h3>
+</div>
+<!-- Connected Bank -->
+<div class="flex items-center justify-between bg-surface-container-highest rounded-lg p-sm border border-outline-variant/10">
+<div class="flex items-center gap-sm">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">account_balance</span>
+</div>
+<div>
+<div class="font-body-md text-body-md text-on-surface">Chase Checking</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">•••• 4321</div>
+</div>
+</div>
+<button class="font-label-caps text-label-caps text-secondary uppercase tracking-wider hover:opacity-80 transition-opacity p-2">Edit</button>
+</div>
+<div class="h-[1px] w-full bg-outline-variant/10 my-xs"></div>
+<!-- Amount Input Display -->
+<div>
+<div class="font-body-sm text-body-sm text-on-surface-variant mb-xs">Initial Allocation</div>
+<div class="flex items-baseline gap-xs">
+<span class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface-variant">$</span>
+<span class="font-display-lg text-display-lg text-on-surface tracking-tighter">10,000</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">.00</span>
+</div>
+<div class="font-body-sm text-body-sm text-tertiary-fixed mt-xs flex items-center gap-1 opacity-90">
+<span class="material-symbols-outlined text-[14px]">bolt</span> Instant transfer available
+                </div>
+</div>
+</section>
+<!-- AI Forecast Visual Area -->
+<section class="relative overflow-hidden bg-surface-container rounded-xl p-md border border-outline-variant/20 min-h-[140px] flex flex-col justify-between">
+<!-- Simulated AI processing glow -->
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-secondary/20 rounded-full blur-[40px] ai-pulse-bg"></div>
+<div class="relative z-10">
+<div class="font-label-caps text-label-caps text-secondary mb-1 flex items-center gap-1 uppercase tracking-widest">
+<span class="material-symbols-outlined text-[14px]">auto_graph</span> Projected 1Y Value
+                </div>
+</div>
+<div class="relative z-10 flex justify-between items-end mt-lg">
+<div class="font-data-tabular text-headline-lg-mobile text-on-surface tracking-tight">$50.00</div>
+<div class="font-body-sm text-body-sm text-tertiary-fixed bg-tertiary-fixed/10 px-2 py-1 rounded">+$1,250</div>
+</div>
+<!-- Stylized chart base line -->
+<div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-secondary-container/10 via-secondary to-tertiary-fixed"></div>
+</section>
+</main>
+<!-- Fixed Bottom Action Bar (Transactional Confirm) -->
+<div class="fixed bottom-0 left-0 w-full px-margin-mobile pb-margin-desktop pt-lg bg-gradient-to-t from-background via-background/95 to-transparent z-50 backdrop-blur-sm">
+<!-- Success state logic applied to primary action button -->
+<button class="w-full bg-tertiary-fixed text-on-tertiary-fixed font-title-md text-title-md py-[18px] rounded-xl flex items-center justify-center gap-2 shadow-[0_4px_24px_rgba(111,251,190,0.15)] hover:opacity-90 active:scale-[0.98] transition-all duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            Confirm Investment
+        </button>
+<p class="text-center font-body-sm text-[11px] text-on-surface-variant mt-sm opacity-60">
+            By confirming, you authorize the deposit and agree to our <a class="underline decoration-outline-variant/30" href="#">Terms of Service</a>.
+        </p>
+</div>
+</body></html>
