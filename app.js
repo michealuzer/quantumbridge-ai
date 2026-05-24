@@ -1266,43 +1266,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function hydrateGlobalPayouts() {
         const container = document.getElementById('global-withdrawals-list');
-        if (!container || !supabaseClient) return;
+        if (!container) return;
 
-        const { data, error } = await supabaseClient.rpc('qt_get_recent_payouts');
-        
-        if (error) {
-            container.innerHTML = `<p class="text-sm text-red-700 text-center py-8">Failed to load global payouts.</p>`;
-            return;
-        }
-
-        if (!data || data.length === 0) {
-            container.innerHTML = `<p class="text-sm text-on-surface/40 text-center py-8">No recent payouts to display.</p>`;
-            return;
-        }
-
-        container.innerHTML = data.map(w => {
-            const icon = w.method === 'bitcoin'
-                ? 'currency_bitcoin'
-                : w.method === 'bank_transfer'
-                    ? 'account_balance'
-                    : 'phone_android';
-
-            return `
-                <div class="py-5 flex items-center gap-4">
-                    <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                        <span class="material-symbols-outlined">${icon}</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-body font-bold text-on-surface/85">${escapeHtml(w.masked_email || 'u***@user.com')}</p>
-                        <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - ${timeAgo(w.created_at)}</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-display font-bold text-primary">${formatCurrency(w.amount_usd)}</p>
-                        <p class="text-xs text-on-surface/40">Paid to investor</p>
-                    </div>
-                </div>
-            `;
-        }).join('');
+        // Clear the loading message
+        container.innerHTML = '';
 
         // Start the live simulation
         if (!window.quantumbridgeLiveSimulator) {
