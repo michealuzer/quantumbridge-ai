@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingState.classList.remove('opacity-0', 'pointer-events-none');
 
         try {
-            // Use absolute path to prevent resolution errors on back/forward navigations
-            const response = await fetch(`/stitch_screens/${filename}`);
+            // Use absolute path with cache-buster to prevent resolution errors and bypass stale cache
+            const response = await fetch(`/stitch_screens/${filename}?t=${Date.now()}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const htmlText = await response.text();
             const parser = new DOMParser();
