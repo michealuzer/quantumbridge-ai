@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function hydrateDashboard() {
         await syncPendingPaymentBeforeDashboard();
 
-        const [profileResult, investmentResult, projectsResult] = await Promise.all([
+        const [profileResult, investmentResult, projectsResult, commissionResult, directResult] = await Promise.all([
             supabaseClient.from('qt_profiles').select('email,display_name,investor_code').maybeSingle(),
             supabaseClient
                 .from('qt_investments')
@@ -779,12 +779,22 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('qt_projects')
                 .select('symbol,side,risk,result_percent,status,placed_at')
                 .order('placed_at', { ascending: false })
-                .limit(4)
+                .limit(4),
+            supabaseClient
+                .from('qt_referral_commissions')
+                .select('amount_usd')
+                .order('created_at', { ascending: false }),
+            supabaseClient
+                .from('qt_profiles')
+                .select('user_id')
+                .eq('referrer_user_id', currentSession.user.id)
         ]);
 
         if (profileResult.error) console.error(profileResult.error);
         if (investmentResult.error) console.error(investmentResult.error);
         if (projectsResult.error) console.error(projectsResult.error);
+        if (commissionResult.error) console.error(commissionResult.error);
+        if (directResult.error) console.error(directResult.error);
 
         const profile = profileResult.data;
         const investment = investmentResult.data;
@@ -803,7 +813,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             setText('dashboard-projected-return', formatCurrency(investment.projected_return_usd, 0));
         }
 
+        hydrateDashboardReferralSummary(profile, commissionResult.data || [], directResult.data || []);
         renderDashboardProjects(dbProjects);
+    }
+
+    function hydrateDashboardReferralSummary(profile, commissions, directReferrals) {
+        const code = profile?.investor_code || '';
+        const link = code ? buildReferralLink(code) : '';
+        const totalEarned = (commissions || []).reduce((sum, row) => sum + Number(row.amount_usd || 0), 0);
+
+        setText('dashboard-referral-link', link || 'Your referral link will appear after your profile is ready.');
+        setText('dashboard-referral-total', formatCurrency(totalEarned));
+        setText('dashboard-referral-direct-count', `${(directReferrals || []).length} direct investor${(directReferrals || []).length === 1 ? '' : 's'} invited.`);
+
+        const copyButton = document.getElementById('dashboard-copy-referral-link');
+        const copyMessage = document.getElementById('dashboard-referral-copy-message');
+        if (!copyButton) return;
+
+        copyButton.disabled = !link;
+        copyButton.addEventListener('click', async () => {
+            if (!link) return;
+            await navigator.clipboard?.writeText(link);
+            if (copyMessage) copyMessage.textContent = 'Referral link copied.';
+        });
     }
 
     async function hydrateReferralPage() {
@@ -879,7 +911,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const form = document.getElementById('withdraw-form');
         const methodSelect = document.getElementById('withdraw-method');
 
-        if (!supabaseClient || !currentSession) return;
+        if (!supabaseClient) return;
+
+        hydrateGlobalPayouts();
+
+        if (!currentSession) return;
 
         // 1. Fetch user profile/investment to show balances
         const [investmentResult, withdrawalsResult] = await Promise.all([
@@ -1226,6 +1262,47 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </article>
         `;
+    }
+
+    async function hydrateGlobalPayouts() {
+        const container = document.getElementById('global-withdrawals-list');
+        if (!container || !supabaseClient) return;
+
+        const { data, error } = await supabaseClient.rpc('qt_get_recent_payouts');
+        
+        if (error) {
+            container.innerHTML = `<p class="text-sm text-red-700 text-center py-8">Failed to load global payouts.</p>`;
+            return;
+        }
+
+        if (!data || data.length === 0) {
+            container.innerHTML = `<p class="text-sm text-on-surface/40 text-center py-8">No recent payouts to display.</p>`;
+            return;
+        }
+
+        container.innerHTML = data.map(w => {
+            const icon = w.method === 'bitcoin'
+                ? 'currency_bitcoin'
+                : w.method === 'bank_transfer'
+                    ? 'account_balance'
+                    : 'phone_android';
+
+            return `
+                <div class="py-5 flex items-center gap-4">
+                    <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined">${icon}</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-body font-bold text-on-surface/85">${escapeHtml(w.masked_email || 'u***@user.com')}</p>
+                        <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - ${timeAgo(w.created_at)}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-display font-bold text-primary">${formatCurrency(w.amount_usd)}</p>
+                        <p class="text-xs text-on-surface/40">Paid to investor</p>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     function setText(id, value) {
