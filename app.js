@@ -87,8 +87,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadingState.classList.remove('opacity-0', 'pointer-events-none');
 
         try {
-            const response = await fetch(`stitch_screens/${filename}`);
-            if (!response.ok) throw new Error('Failed to load screen');
+            // Use absolute path to prevent resolution errors on back/forward navigations
+            const response = await fetch(`/stitch_screens/${filename}`);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const htmlText = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlText, 'text/html');
@@ -121,8 +122,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 100);
             }, 250);
         } catch (error) {
-            console.error('Routing Error:', error);
-            container.innerHTML = `<div class="p-8 text-center mt-20"><h2 class="font-display text-3xl font-bold">Failed to load screen: ${filename}</h2><p class="mt-2 text-on-surface/60">${error.message}</p></div>`;
+            console.error(error);
+            container.innerHTML = `
+                <div class="p-8 text-center mt-20">
+                    <h2 class="font-display text-3xl font-bold">Failed to load screen</h2>
+                    <p class="mt-2 text-on-surface/60">${error.message}</p>
+                    <button onclick="window.location.hash='/dashboard'; window.location.reload();" class="mt-6 px-6 py-3 bg-primary text-white rounded-xl font-bold shadow-lg">Return to Dashboard</button>
+                </div>
+            `;
             container.appendChild(loadingState);
             loadingState.classList.add('opacity-0', 'pointer-events-none');
             container.classList.remove('opacity-0');
@@ -1229,7 +1236,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             if (statusCode === 2 || description === 'FAILED' || description === 'INVALID') {
+                sessionStorage.removeItem('quantumbridge_pending_payment');
                 showDashboardPaymentBanner(`Payment ${description.toLowerCase() || 'failed'}. Your balance was not changed.`, 'error');
+                setTimeout(() => showDashboardPaymentBanner('', 'hidden'), 6000);
                 return;
             }
 
