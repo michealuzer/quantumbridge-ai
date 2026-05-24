@@ -369,10 +369,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    function refreshRouteData() {
+    async function refreshRouteData() {
         const hash = window.location.hash.replace('#/', '').split('?')[0] || '';
-        if (hash === 'dashboard' || hash === 'explorer' || hash === 'history') {
-            hydrateRoute(hash);
+        if (['dashboard', 'explorer', 'history', 'elite_tier', 'onboarding'].includes(hash)) {
+            await hydrateRoute(hash);
         }
     }
 
@@ -1599,6 +1599,82 @@ document.addEventListener('DOMContentLoaded', async () => {
             "'": '&#039;'
         }[char]));
     }
+
+    // Custom Pull-to-Refresh implementation
+    let ptrStartY = 0;
+    let ptrCurrentY = 0;
+    let ptrIsPulling = false;
+    let ptrIndicator = null;
+    let ptrIcon = null;
+    const PTR_THRESHOLD = 70;
+
+    container.addEventListener('touchstart', (e) => {
+        if (container.scrollTop === 0) {
+            ptrStartY = e.touches[0].clientY;
+            ptrIsPulling = true;
+        } else {
+            ptrIsPulling = false;
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchmove', (e) => {
+        if (!ptrIsPulling) return;
+        ptrCurrentY = e.touches[0].clientY;
+        const pullDistance = ptrCurrentY - ptrStartY;
+
+        if (pullDistance > 0 && container.scrollTop === 0) {
+            if (!ptrIndicator) {
+                ptrIndicator = document.createElement('div');
+                ptrIndicator.className = 'absolute top-0 left-0 w-full flex justify-center overflow-hidden transition-all duration-200 pointer-events-none z-[100]';
+                ptrIndicator.style.height = '0px';
+                
+                ptrIcon = document.createElement('div');
+                ptrIcon.className = 'mt-4 w-10 h-10 rounded-full bg-surface shadow-xl border border-outline-variant/20 flex items-center justify-center text-primary transform scale-0 transition-transform duration-200';
+                ptrIcon.innerHTML = '<span class="material-symbols-outlined text-[24px]">refresh</span>';
+                
+                ptrIndicator.appendChild(ptrIcon);
+                container.appendChild(ptrIndicator);
+            }
+            
+            const distance = Math.min(pullDistance, 140);
+            ptrIndicator.style.height = `${distance}px`;
+            
+            if (pullDistance > PTR_THRESHOLD) {
+                ptrIcon.style.transform = `scale(1) rotate(${pullDistance * 2}deg)`;
+                ptrIcon.classList.add('text-primary-container', 'shadow-primary/20');
+            } else {
+                ptrIcon.style.transform = `scale(${Math.max(0, pullDistance / PTR_THRESHOLD)})`;
+                ptrIcon.classList.remove('text-primary-container', 'shadow-primary/20');
+            }
+        }
+    }, { passive: true });
+
+    container.addEventListener('touchend', async () => {
+        if (!ptrIsPulling || !ptrIndicator) return;
+        ptrIsPulling = false;
+        const pullDistance = ptrCurrentY - ptrStartY;
+
+        if (pullDistance > PTR_THRESHOLD) {
+            ptrIcon.classList.add('animate-spin');
+            ptrIndicator.style.height = '80px';
+            
+            await refreshRouteData();
+            
+            ptrIndicator.style.height = '0px';
+            setTimeout(() => {
+                if (ptrIndicator) ptrIndicator.remove();
+                ptrIndicator = null;
+                ptrIcon = null;
+            }, 300);
+        } else {
+            ptrIndicator.style.height = '0px';
+            setTimeout(() => {
+                if (ptrIndicator) ptrIndicator.remove();
+                ptrIndicator = null;
+                ptrIcon = null;
+            }, 300);
+        }
+    });
 
     window.addEventListener('hashchange', loadRoute);
     loadRoute();
