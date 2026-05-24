@@ -1303,6 +1303,77 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
         }).join('');
+
+        // Start the live simulation
+        if (!window.quantumbridgeLiveSimulator) {
+            window.quantumbridgeLiveSimulator = true;
+            simulateLivePayouts();
+        }
+    }
+
+    function simulateLivePayouts() {
+        const container = document.getElementById('global-withdrawals-list');
+        if (!container) return;
+
+        const methods = ['bitcoin', 'bank_transfer', 'mobile_money'];
+        const domains = ['gmail.com', 'yahoo.com', 'hotmail.com', 'outlook.com'];
+        const letters = 'abcdefghijklmnopqrstuvwxyz';
+
+        function addFakePayout() {
+            // Generate random data
+            const letter = letters[Math.floor(Math.random() * letters.length)];
+            const domain = domains[Math.floor(Math.random() * domains.length)];
+            const email = `${letter}***@${domain}`;
+            const amount = (Math.random() * (2500 - 50) + 50).toFixed(2);
+            const method = methods[Math.floor(Math.random() * methods.length)];
+            
+            const icon = method === 'bitcoin'
+                ? 'currency_bitcoin'
+                : method === 'bank_transfer'
+                    ? 'account_balance'
+                    : 'phone_android';
+
+            // Create new DOM element
+            const el = document.createElement('div');
+            el.className = 'py-5 flex items-center gap-4 animate-pulse duration-1000'; // Add a little pulse when it appears
+            el.innerHTML = `
+                <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                    <span class="material-symbols-outlined">${icon}</span>
+                </div>
+                <div class="flex-1">
+                    <p class="font-body font-bold text-on-surface/85">${email}</p>
+                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - Just now</p>
+                </div>
+                <div class="text-right">
+                    <p class="font-display font-bold text-primary">$${amount}</p>
+                    <p class="text-xs text-on-surface/40">Paid to investor</p>
+                </div>
+            `;
+
+            // Insert at the top
+            if (container.children.length > 0) {
+                container.insertBefore(el, container.firstChild);
+            } else {
+                container.appendChild(el);
+            }
+
+            // Remove pulse after 1s to settle
+            setTimeout(() => {
+                el.classList.remove('animate-pulse', 'duration-1000');
+            }, 1000);
+
+            // Keep list max size to 10 to avoid DOM bloat
+            if (container.children.length > 10) {
+                container.removeChild(container.lastChild);
+            }
+
+            // Schedule next one between 4 and 15 seconds
+            const nextDelay = Math.random() * (15000 - 4000) + 4000;
+            setTimeout(addFakePayout, nextDelay);
+        }
+
+        // Start loop
+        setTimeout(addFakePayout, 3000);
     }
 
     function setText(id, value) {
