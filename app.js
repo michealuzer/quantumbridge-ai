@@ -427,12 +427,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (calcAmount && calcPlan) {
             calcPlan.innerHTML = (data || []).map(plan => (
-                `<option value="${Number(plan.daily_return_percent)},${Number(plan.duration_days)}">${escapeHtml(plan.name)} (${formatPercent(plan.daily_return_percent)} Daily / ${Number(plan.duration_days)} Days)</option>`
+                `<option value="${Number(plan.daily_return_percent)},${Number(plan.duration_days)},${Number(plan.min_deposit_usd || 10)}">${escapeHtml(plan.name)} (${formatPercent(plan.daily_return_percent)} Daily / ${Number(plan.duration_days)} Days)</option>`
             )).join('');
 
             function updateCalculator() {
-                const amount = parseFloat(calcAmount.value) || 0;
-                const [dailyPercent, termDays] = calcPlan.value.split(',').map(Number);
+                let amount = parseFloat(calcAmount.value) || 0;
+                const [dailyPercent, termDays, minDeposit] = calcPlan.value.split(',').map(Number);
+                if (Number.isFinite(minDeposit)) {
+                    calcAmount.min = String(minDeposit);
+                    if (!amount || amount < minDeposit) {
+                        amount = minDeposit;
+                        calcAmount.value = String(minDeposit);
+                    }
+                }
                 const dailyRate = dailyPercent / 100;
                 const isCompounding = Boolean(calcCompound?.checked);
                 
