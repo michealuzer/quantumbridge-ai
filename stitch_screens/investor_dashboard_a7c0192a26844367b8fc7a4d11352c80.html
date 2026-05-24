@@ -45,6 +45,50 @@
         </div>
     </section>
 
+    <section class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6 mb-12">
+        <div class="bg-surface-container-low rounded-[2rem] p-6 md:p-8 border border-outline-variant/30">
+            <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Referral Hub</span>
+                    <h2 class="font-display text-3xl font-bold mt-2">Invite investors and earn commissions</h2>
+                    <p class="text-sm text-on-surface/60 mt-3 max-w-2xl">Share your personal link. When invited investors fund their accounts, commissions are tracked across three levels.</p>
+                </div>
+                <a href="#/elite_tier" class="inline-flex items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-primary">View Details</a>
+            </div>
+
+            <div class="mt-6 rounded-2xl bg-white/10 border border-white/15 p-4">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-on-surface/45">Your Invite Link</p>
+                <p id="dashboard-referral-link" class="text-sm font-semibold mt-2 break-all text-on-surface/75">Loading your referral link...</p>
+            </div>
+
+            <div class="mt-4 flex flex-col sm:flex-row gap-3">
+                <button id="dashboard-copy-referral-link" class="flex-1 py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20">Copy Referral Link</button>
+                <p id="dashboard-referral-copy-message" class="min-h-5 flex items-center text-sm font-semibold text-on-surface/55"></p>
+            </div>
+        </div>
+
+        <div class="bg-on-surface text-white rounded-[2rem] p-6 md:p-8 border border-white/15">
+            <span class="text-[10px] font-bold uppercase tracking-widest opacity-55">Referral Earnings</span>
+            <div id="dashboard-referral-total" class="font-display text-5xl font-bold mt-3">$0.00</div>
+            <p class="text-sm opacity-70 mt-3">Total commission earned from confirmed investor deposits.</p>
+            <div class="mt-6 grid grid-cols-3 gap-3">
+                <div class="rounded-2xl bg-white/10 p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-45">Level 1</p>
+                    <p class="font-display text-2xl font-bold mt-1">5%</p>
+                </div>
+                <div class="rounded-2xl bg-white/10 p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-45">Level 2</p>
+                    <p class="font-display text-2xl font-bold mt-1">2%</p>
+                </div>
+                <div class="rounded-2xl bg-white/10 p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest opacity-45">Level 3</p>
+                    <p class="font-display text-2xl font-bold mt-1">1%</p>
+                </div>
+            </div>
+            <p id="dashboard-referral-direct-count" class="text-sm opacity-70 mt-5">Loading invited investors...</p>
+        </div>
+    </section>
+
     <!-- Main Grid -->
     <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
         <!-- Chart Section -->
