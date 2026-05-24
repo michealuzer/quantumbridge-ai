@@ -12,19 +12,20 @@
 
 .glass-panel {
     background:
-        linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(239, 244, 255, 0.62));
+        linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.07));
     backdrop-filter: blur(24px) saturate(150%);
     -webkit-backdrop-filter: blur(24px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow:
-        0 18px 48px rgba(11, 28, 48, 0.16),
-        inset 0 1px 0 rgba(255, 255, 255, 0.76);
+        0 24px 70px rgba(0, 0, 0, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 /* Navigation Links */
 .cp-link.active {
-    color: var(--primary) !important;
-    background: rgba(0, 109, 50, 0.10);
+    color: #ffffff !important;
+    background: rgba(0, 209, 102, 0.22);
+    box-shadow: inset 0 0 0 1px rgba(0, 209, 102, 0.18);
 }
 
 .cp-link {
@@ -33,6 +34,7 @@
     padding: 7px 10px;
     border-radius: 999px;
     white-space: nowrap;
+    color: rgba(255, 255, 255, 0.62) !important;
 }
 
 .cp-link span {
@@ -40,7 +42,7 @@
 }
 
 .cp-link:hover {
-    background: rgba(0, 109, 50, 0.06);
+    background: rgba(255, 255, 255, 0.11);
 }
 
 .cp-link.active .material-symbols-outlined {
@@ -76,6 +78,18 @@
     animation: pan-slow 40s ease-in-out infinite;
 }
 
+@keyframes landingMotion {
+    from { transform: scale(1.02) translate3d(-1.5%, 0, 0); background-position: 0% 50%, center, center; }
+    to { transform: scale(1.08) translate3d(1.5%, -1%, 0); background-position: 100% 50%, center, center; }
+}
+
+#loading-state {
+    background:
+        radial-gradient(circle at 72% 24%, rgba(0, 209, 102, 0.14), transparent 30%),
+        linear-gradient(135deg, rgba(3, 7, 12, 0.98), rgba(7, 17, 29, 0.96)) !important;
+    color: rgba(255, 255, 255, 0.88);
+}
+
 @keyframes qtRise {
     0%, 100% { transform: scaleY(0.95); opacity: 0.8; }
     50% { transform: scaleY(1.05); opacity: 1; }
@@ -100,6 +114,118 @@
     padding-bottom: max(8rem, env(safe-area-inset-bottom)) !important;
 }
 
+#injected-view > div:not(.landing-video-shell) {
+    position: relative;
+    isolation: isolate;
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+#injected-view > div:not(.landing-video-shell)::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+        linear-gradient(115deg, transparent 0 40%, rgba(0, 209, 102, 0.11) 48%, transparent 56% 100%),
+        radial-gradient(circle at 84% 16%, rgba(0, 209, 102, 0.18), transparent 28%),
+        radial-gradient(circle at 12% 88%, rgba(209, 228, 255, 0.10), transparent 26%);
+    background-size: 180% 180%, 100% 100%, 100% 100%;
+    opacity: 0.78;
+    animation: landingMotion 16s ease-in-out infinite alternate;
+}
+
+#injected-view > div:not(.landing-video-shell) header {
+    color: rgba(255, 255, 255, 0.94);
+}
+
+#injected-view > div:not(.landing-video-shell) h1,
+#injected-view > div:not(.landing-video-shell) h2,
+#injected-view > div:not(.landing-video-shell) h3,
+#injected-view > div:not(.landing-video-shell) h4,
+#injected-view > div:not(.landing-video-shell) .font-display {
+    color: inherit;
+}
+
+#injected-view > div:not(.landing-video-shell) [class*="text-on-surface"] {
+    color: rgba(255, 255, 255, 0.62) !important;
+}
+
+#injected-view > div:not(.landing-video-shell) h1[class*="text-on-surface"],
+#injected-view > div:not(.landing-video-shell) h2[class*="text-on-surface"],
+#injected-view > div:not(.landing-video-shell) h3[class*="text-on-surface"],
+#injected-view > div:not(.landing-video-shell) .font-bold[class*="text-on-surface"] {
+    color: rgba(255, 255, 255, 0.93) !important;
+}
+
+#injected-view > div:not(.landing-video-shell) .text-primary {
+    color: #00d166 !important;
+}
+
+#injected-view > div:not(.landing-video-shell) .text-secondary {
+    color: #d1e4ff !important;
+}
+
+#injected-view > div:not(.landing-video-shell) :is([class*="bg-white"], [class*="bg-surface-container"], [class*="bg-on-surface"]) {
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.075)) !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    box-shadow:
+        0 22px 64px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(22px) saturate(145%);
+    -webkit-backdrop-filter: blur(22px) saturate(145%);
+}
+
+#injected-view > div:not(.landing-video-shell) .bg-primary {
+    background:
+        radial-gradient(circle at 88% 18%, rgba(255, 255, 255, 0.22), transparent 28%),
+        linear-gradient(135deg, rgba(0, 209, 102, 0.92), rgba(0, 109, 50, 0.88)) !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.18) !important;
+}
+
+#injected-view > div:not(.landing-video-shell) :is(input, select, textarea) {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.20) !important;
+    color: rgba(255, 255, 255, 0.94) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10);
+}
+
+#injected-view > div:not(.landing-video-shell) :is(input, textarea)::placeholder {
+    color: rgba(255, 255, 255, 0.42) !important;
+}
+
+#injected-view > div:not(.landing-video-shell) select option {
+    background: #07111d;
+    color: #ffffff;
+}
+
+#injected-view > div:not(.landing-video-shell) :is(a, button)[class*="bg-white"][class*="text-primary"],
+#injected-view > div:not(.landing-video-shell) :is(a, button)[class*="bg-white"] {
+    background: rgba(255, 255, 255, 0.94) !important;
+    color: #006d32 !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+}
+
+#injected-view > div:not(.landing-video-shell) :is(button, a).bg-primary {
+    color: #ffffff !important;
+    box-shadow: 0 18px 42px rgba(0, 209, 102, 0.20);
+}
+
+#injected-view > div:not(.landing-video-shell) [class*="divide-outline"] > :not([hidden]) ~ :not([hidden]),
+#injected-view > div:not(.landing-video-shell) [class*="border-outline"] {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+#injected-view > div:not(.landing-video-shell) .rounded-\[2rem\],
+#injected-view > div:not(.landing-video-shell) .rounded-\[2\.5rem\],
+#injected-view > div:not(.landing-video-shell) .rounded-2xl,
+#injected-view > div:not(.landing-video-shell) .rounded-3xl {
+    overflow: hidden;
+}
+
 @media (min-width: 769px) {
     #injected-view > div {
         padding-bottom: 7rem !important;
@@ -110,7 +236,7 @@
 @media (max-width: 768px) {
     .glass-panel {
         background:
-            linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(239, 244, 255, 0.66));
+            linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.08));
         padding-bottom: env(safe-area-inset-bottom);
     }
 
@@ -121,8 +247,8 @@
         bottom: 18px !important;
         border-radius: 999px;
         box-shadow:
-            0 18px 42px rgba(11, 28, 48, 0.18),
-            inset 0 1px 0 rgba(255, 255, 255, 0.78);
+            0 20px 58px rgba(0, 0, 0, 0.40),
+            inset 0 1px 0 rgba(255, 255, 255, 0.20);
     }
 
     #control-panel .nav-secondary {
