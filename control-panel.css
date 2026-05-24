@@ -133,7 +133,6 @@
         radial-gradient(circle at 12% 88%, rgba(209, 228, 255, 0.10), transparent 26%);
     background-size: 180% 180%, 100% 100%, 100% 100%;
     opacity: 0.78;
-    animation: landingMotion 16s ease-in-out infinite alternate;
 }
 
 #injected-view > div:not(.landing-video-shell) header {
