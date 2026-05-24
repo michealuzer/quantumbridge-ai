@@ -914,6 +914,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!supabaseClient) return;
 
         hydrateGlobalPayouts();
+        hydrateWithdrawalAdminPanel();
 
         if (!currentSession) return;
 
@@ -1055,29 +1056,84 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 setWithdrawState(true, 'Submitting payout request...');
 
-                const { error } = await supabaseClient
-                    .from('qt_withdrawals')
-                    .insert({
-                        user_id: currentSession.user.id,
+                const { data, error } = await supabaseClient.functions.invoke('withdrawal-request', {
+                    body: {
                         amount_usd: amount,
-                        method: method,
-                        details: details,
-                        status: 'pending'
-                    });
+                        method,
+                        details,
+                    },
+                });
 
                 if (error) {
                     setWithdrawState(false);
-                    setWithdrawMessage(error.message, 'error');
+                    setWithdrawMessage(data?.error || error.message, 'error');
                     return;
                 }
 
                 setWithdrawState(false);
-                setWithdrawMessage('Your withdrawal request has been submitted and is processing.', 'success');
+                const emailNote = data?.email?.sent
+                    ? ' We have notified the payout desk.'
+                    : ' The payout desk will see it in the admin queue.';
+                setWithdrawMessage(`Your withdrawal request has been submitted and is processing.${emailNote}`, 'success');
                 form.reset();
                 // Refresh data
                 await hydrateWithdrawalPage();
             });
         }
+    }
+
+    async function hydrateWithdrawalAdminPanel() {
+        const section = document.getElementById('withdraw-admin-section');
+        const list = document.getElementById('admin-withdrawals-list');
+        const refreshButton = document.getElementById('refresh-admin-withdrawals');
+        if (!section || !list || !currentSession) return;
+
+        const adminEmail = 'michealuzer@gmail.com';
+        if (String(currentSession.user?.email || '').toLowerCase() !== adminEmail) {
+            section.classList.add('hidden');
+            return;
+        }
+
+        section.classList.remove('hidden');
+        refreshButton?.addEventListener('click', hydrateWithdrawalAdminPanel, { once: true });
+        list.innerHTML = '<p class="text-sm text-on-surface/50 py-8 text-center">Loading payout requests...</p>';
+
+        const { data, error } = await supabaseClient.functions.invoke('withdrawal-admin', {
+            body: { action: 'list' },
+        });
+
+        if (error || data?.error) {
+            list.innerHTML = `<p class="text-sm text-red-700 py-8 text-center">${escapeHtml(data?.error || error.message)}</p>`;
+            return;
+        }
+
+        const withdrawals = data?.withdrawals || [];
+        if (!withdrawals.length) {
+            list.innerHTML = '<p class="text-sm text-on-surface/50 py-8 text-center">No withdrawal requests yet.</p>';
+            return;
+        }
+
+        list.innerHTML = withdrawals.map(withdrawal => renderAdminWithdrawal(withdrawal)).join('');
+        list.querySelectorAll('[data-mark-paid]').forEach(button => {
+            button.addEventListener('click', async () => {
+                const withdrawalId = button.getAttribute('data-mark-paid');
+                button.disabled = true;
+                button.textContent = 'Updating...';
+                const { data: updateData, error: updateError } = await supabaseClient.functions.invoke('withdrawal-admin', {
+                    body: {
+                        action: 'mark_paid',
+                        withdrawal_id: withdrawalId,
+                    },
+                });
+                if (updateError || updateData?.error) {
+                    button.disabled = false;
+                    button.textContent = 'Mark Paid';
+                    alert(updateData?.error || updateError.message);
+                    return;
+                }
+                await hydrateWithdrawalAdminPanel();
+            });
+        });
     }
 
     function setWithdrawMessage(message, type = 'info') {
@@ -1101,6 +1157,47 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (loading) {
             setWithdrawMessage(message, 'info');
         }
+    }
+
+    function renderAdminWithdrawal(withdrawal) {
+        const profile = withdrawal.profile || (Array.isArray(withdrawal.qt_profiles)
+            ? withdrawal.qt_profiles[0]
+            : withdrawal.qt_profiles);
+        const status = String(withdrawal.status || 'pending');
+        const details = withdrawal.details || {};
+        const detailsText = Object.entries(details)
+            .map(([key, value]) => `${key.replaceAll('_', ' ')}: ${value || '-'}`)
+            .join(' | ');
+        const canMarkPaid = status !== 'completed';
+        const statusClass = status === 'completed'
+            ? 'text-primary bg-primary/10'
+            : status === 'rejected'
+                ? 'text-red-700 bg-red-50'
+                : 'text-on-surface/70 bg-white/10';
+
+        return `
+            <article class="py-5 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div class="flex-1">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <p class="font-display text-2xl font-bold">${formatCurrency(withdrawal.amount_usd)}</p>
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClass}">${escapeHtml(status)}</span>
+                    </div>
+                    <p class="text-sm text-on-surface/70 mt-2">${escapeHtml(profile?.display_name || profile?.email || 'Investor')} - ${escapeHtml(profile?.investor_code || 'No code')}</p>
+                    <p class="text-xs text-on-surface/45 uppercase tracking-widest mt-1">${escapeHtml(formatWithdrawMethod(withdrawal.method))} - ${timeAgo(withdrawal.created_at)}</p>
+                    <p class="text-xs text-on-surface/55 mt-2 break-words">${escapeHtml(detailsText || 'No payout details supplied')}</p>
+                    ${withdrawal.investor_notified_at ? '<p class="text-xs text-primary mt-2">Investor notified.</p>' : ''}
+                </div>
+                ${canMarkPaid
+                    ? `<button data-mark-paid="${escapeHtml(withdrawal.id)}" class="px-5 py-3 rounded-xl bg-primary text-white font-bold">Mark Paid</button>`
+                    : '<span class="px-5 py-3 rounded-xl bg-white/10 text-sm font-bold text-on-surface/60">Paid</span>'}
+            </article>
+        `;
+    }
+
+    function formatWithdrawMethod(method) {
+        if (method === 'bank_transfer') return 'Bank Transfer';
+        if (method === 'bitcoin') return 'Bitcoin Wallet';
+        return 'Mobile Money';
     }
 
 
@@ -1268,10 +1365,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         const container = document.getElementById('global-withdrawals-list');
         if (!container) return;
 
-        // Clear the loading message
         container.innerHTML = '';
 
-        // Start the live simulation
+        // Attempt to fetch REAL data first
+        if (supabaseClient) {
+            try {
+                const { data, error } = await supabaseClient.rpc('qt_get_recent_payouts');
+                if (!error && data && data.length > 0) {
+                    const realHtml = data.map(w => {
+                        const icon = w.method === 'bitcoin'
+                            ? 'currency_bitcoin'
+                            : w.method === 'bank_transfer'
+                                ? 'account_balance'
+                                : 'phone_android';
+
+                        return `
+                            <div class="py-5 flex items-center gap-4">
+                                <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                                    <span class="material-symbols-outlined">${icon}</span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="font-body font-bold text-on-surface/85">${escapeHtml(w.masked_email || 'u***@user.com')}</p>
+                                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - ${timeAgo(w.created_at)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <p class="font-display font-bold text-primary">${formatCurrency(w.amount_usd)}</p>
+                                    <p class="text-xs text-on-surface/40">Real payout</p>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                    container.innerHTML = realHtml;
+                }
+            } catch (err) {
+                // Silently ignore if the user hasn't run the SQL script yet
+            }
+        }
+
+        // Start the live simulation to supplement real data
         if (!window.quantumbridgeLiveSimulator) {
             window.quantumbridgeLiveSimulator = true;
             simulateLivePayouts();
