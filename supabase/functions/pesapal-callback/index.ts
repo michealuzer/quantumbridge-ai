@@ -8,7 +8,7 @@ Deno.serve(async (req) => {
     await syncPaymentStatus(orderTrackingId, "CALLBACKURL", Object.fromEntries(url.searchParams.entries()));
   }
 
-  const appUrl = Deno.env.get("PUBLIC_APP_URL") || "http://127.0.0.1:5173";
+  const appUrl = Deno.env.get("PUBLIC_APP_URL") || "https://quantumbridge-ai.netlify.app";
   const dashboardUrl = new URL(appUrl);
   dashboardUrl.hash = orderTrackingId ? `/dashboard?payment=${encodeURIComponent(orderTrackingId)}` : "/dashboard";
   return Response.redirect(dashboardUrl.toString(), 302);

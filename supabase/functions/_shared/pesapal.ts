@@ -40,7 +40,7 @@ export function getConfig(): PesapalConfig {
     consumerKey,
     consumerSecret,
     callbackUrl: Deno.env.get("PESAPAL_CALLBACK_URL") || `${supabaseUrl}/functions/v1/pesapal-callback`,
-    cancellationUrl: Deno.env.get("PESAPAL_CANCELLATION_URL") || Deno.env.get("PUBLIC_APP_URL") || "http://127.0.0.1:5173/#/onboarding",
+    cancellationUrl: Deno.env.get("PESAPAL_CANCELLATION_URL") || Deno.env.get("PUBLIC_APP_URL") || "https://quantumbridge-ai.netlify.app/#/dashboard",
     ipnId: Deno.env.get("PESAPAL_IPN_ID") || undefined,
     ipnUrl: Deno.env.get("PESAPAL_IPN_URL") || `${supabaseUrl}/functions/v1/pesapal-ipn`,
   };

@@ -5,75 +5,175 @@
                 <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
                 <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Investor Payouts</span>
             </div>
-            <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight text-on-surface">Investor Withdrawal History</h1>
-            <p class="font-body text-on-surface/60 mt-3 max-w-2xl">Daily yields are available for investor withdrawal or manual reinvestment after plan activation.</p>
+            <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight text-on-surface">Funds Withdrawal</h1>
+            <p class="font-body text-on-surface/60 mt-3 max-w-2xl">Request payouts of your daily yields. Funds are processed securely back to your account.</p>
         </div>
-        <a href="#/onboarding" class="px-6 py-3 bg-primary text-white rounded-xl font-bold text-center shadow-lg shadow-primary/20">Open Account</a>
+        <div class="flex items-center gap-4 bg-surface-container-low border border-outline-variant/30 px-6 py-3 rounded-2xl">
+            <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+            <div class="text-left">
+                <p class="text-[9px] font-bold uppercase tracking-wider text-on-surface/40">Withdrawable Yield</p>
+                <p id="withdraw-available-balance" class="font-display text-xl font-bold text-on-surface">$0.00</p>
+            </div>
+        </div>
     </header>
 
     <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-        <div class="bg-primary text-white p-6 rounded-[2rem]">
-            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Total Platform Withdrawals</span>
-            <div class="font-display text-4xl font-bold mt-2">$106.5B</div>
+        <div class="bg-primary text-white p-6 rounded-[2rem] shadow-lg shadow-primary/10">
+            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Active Principal</span>
+            <div id="withdraw-active-principal" class="font-display text-4xl font-bold mt-2">$0.00</div>
         </div>
         <div class="bg-surface-container p-6 rounded-[2rem]">
             <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Processing Window</span>
-            <div class="font-display text-4xl font-bold mt-2 text-on-surface">24H</div>
+            <div class="font-display text-4xl font-bold mt-2 text-on-surface">24 Hours</div>
         </div>
         <div class="bg-surface-container p-6 rounded-[2rem]">
             <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Withdrawal Fees</span>
-            <div class="font-display text-4xl font-bold mt-2 text-on-surface">None</div>
+            <div class="font-display text-4xl font-bold mt-2 text-on-surface">0%</div>
         </div>
     </section>
 
-    <section class="bg-surface-container-low rounded-[2rem] p-6 md:p-8">
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="font-display text-2xl font-bold">Recent Investor Payouts</h2>
-            <span class="text-[10px] font-bold uppercase tracking-widest text-primary">Live</span>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Withdrawal Form -->
+        <form id="withdraw-form" class="lg:col-span-5 bg-white rounded-[2rem] p-8 border border-outline-variant/30 shadow-sm flex flex-col gap-6">
+            <h2 class="font-display text-2xl font-bold text-on-surface">Request Withdrawal</h2>
+            
+            <div class="space-y-5">
+                <!-- Amount input -->
+                <div class="bg-surface-container-low rounded-2xl p-5">
+                    <label for="withdraw-amount" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Withdrawal Amount ($ USD)</label>
+                    <input id="withdraw-amount" name="amount" type="number" min="5" step="0.01" placeholder="0.00" required
+                           class="w-full bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-display text-3xl font-bold focus:ring-2 focus:ring-primary/40 outline-none mt-2">
+                    <p class="text-xs text-on-surface/50 mt-2">Minimum withdrawal: $5.00 USD.</p>
+                </div>
+
+                <!-- Method selection -->
+                <div class="flex flex-col gap-2">
+                    <label for="withdraw-method" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Payout Method</label>
+                    <select id="withdraw-method" name="method" required
+                            class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body font-semibold focus:ring-2 focus:ring-primary/40 outline-none">
+                        <option value="mobile_money">Mobile Money (M-Pesa / Airtel)</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="bitcoin">Bitcoin Wallet</option>
+                    </select>
+                </div>
+
+                <!-- Dynamic input containers -->
+                <div id="method-details-container" class="space-y-4 pt-2">
+                    <!-- Mobile Money Details -->
+                    <div id="details-mobile_money" class="space-y-4">
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-phone" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Phone Number (with Country Code)</label>
+                            <input id="withdraw-phone" type="tel" placeholder="+254700000000" required
+                                   class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-provider" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Mobile Provider</label>
+                            <select id="withdraw-provider" class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                                <option value="mpesa">Safaricom M-Pesa</option>
+                                <option value="airtel">Airtel Money</option>
+                                <option value="mtn">MTN Mobile Money</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Bank Details (hidden by default) -->
+                    <div id="details-bank_transfer" class="space-y-4 hidden">
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-bank-name" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Bank Name</label>
+                            <input id="withdraw-bank-name" type="text" placeholder="Equity Bank, KCB, etc."
+                                   class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-bank-acc" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Account Number</label>
+                            <input id="withdraw-bank-acc" type="text" placeholder="1234567890"
+                                   class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-bank-holder" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Account Holder Name</label>
+                            <input id="withdraw-bank-holder" type="text" placeholder="John Doe"
+                                   class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Bitcoin Details (hidden by default) -->
+                    <div id="details-bitcoin" class="space-y-4 hidden">
+                        <div class="flex flex-col gap-2">
+                            <label for="withdraw-btc-address" class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Bitcoin Wallet Address</label>
+                            <input id="withdraw-btc-address" type="text" placeholder="1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+                                   class="bg-white border border-outline-variant/40 rounded-xl px-4 py-3 font-body focus:ring-2 focus:ring-primary/40 outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="withdraw-submit w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20 hover:opacity-90 transition-opacity">Request Payout</button>
+                <p id="withdraw-message" class="min-h-5 text-sm font-semibold text-on-surface/55"></p>
+            </div>
+        </form>
+
+        <!-- Payout Records -->
+        <div class="lg:col-span-7 flex flex-col gap-8">
+            <!-- Dynamic personal requests -->
+            <section class="bg-surface-container-low rounded-[2rem] p-6 md:p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-display text-2xl font-bold text-on-surface">Your Payout Requests</h2>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-primary">Live</span>
+                </div>
+                <div id="personal-withdrawals-list" class="flex flex-col divide-y divide-outline-variant/30 min-h-[100px] justify-center">
+                    <p class="text-sm text-on-surface/40 text-center py-8">Loading your requests...</p>
+                </div>
+            </section>
+
+            <!-- Static recent platform payouts for social proof -->
+            <section class="bg-surface-container-low rounded-[2rem] p-6 md:p-8 opacity-90">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-display text-xl font-bold text-on-surface/70">Recent Platform Payouts</h2>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Global</span>
+                </div>
+
+                <div class="flex flex-col divide-y divide-outline-variant/30">
+                    <div class="py-5 flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined">real_estate_agent</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-body font-bold text-on-surface/85">W19795091</p>
+                            <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 5 seconds ago</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-display font-bold text-primary">$368.00</p>
+                            <p class="text-xs text-on-surface/40">Paid to Investor account</p>
+                        </div>
+                    </div>
+
+                    <div class="py-5 flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center">
+                            <span class="material-symbols-outlined">verified</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-body font-bold text-on-surface/85">W18258115</p>
+                            <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 23 seconds ago</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-display font-bold text-primary">$494.03</p>
+                            <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">No withdrawal fee</p>
+                        </div>
+                    </div>
+
+                    <div class="py-5 flex items-center gap-4">
+                        <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                            <span class="material-symbols-outlined">account_balance_wallet</span>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-body font-bold text-on-surface/85">W11425506</p>
+                            <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 45 seconds ago</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-display font-bold text-primary">$1,839.50</p>
+                            <p class="text-xs text-on-surface/40">Confirmed payout</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
-
-        <div class="flex flex-col divide-y divide-outline-variant/30">
-            <div class="py-5 flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                    <span class="material-symbols-outlined">real_estate_agent</span>
-                </div>
-                <div class="flex-1">
-                    <p class="font-body font-bold">W19795091</p>
-                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 5 seconds ago</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-display font-bold text-primary">$368.00</p>
-                    <p class="text-xs text-on-surface/40">Paid to Investor account</p>
-                </div>
-            </div>
-
-            <div class="py-5 flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center">
-                    <span class="material-symbols-outlined">verified</span>
-                </div>
-                <div class="flex-1">
-                    <p class="font-body font-bold">W18258115</p>
-                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 23 seconds ago</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-display font-bold text-primary">$494.03</p>
-                    <p class="text-xs text-on-surface/40">No withdrawal fee</p>
-                </div>
-            </div>
-
-            <div class="py-5 flex items-center gap-4">
-                <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                    <span class="material-symbols-outlined">account_balance_wallet</span>
-                </div>
-                <div class="flex-1">
-                    <p class="font-body font-bold">W11425506</p>
-                    <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">Payout - 45 seconds ago</p>
-                </div>
-                <div class="text-right">
-                    <p class="font-display font-bold text-primary">$1,839.50</p>
-                    <p class="text-xs text-on-surface/40">Confirmed payout</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 </div>

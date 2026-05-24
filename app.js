@@ -332,6 +332,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (hash === 'explorer') await hydratePlans();
             if (hash === 'onboarding') await hydrateFundingForm();
             if (hash === 'live_projects') await hydrateStandaloneProjects();
+            if (hash === 'history') await hydrateWithdrawalPage();
         } catch (error) {
             console.error('Hydration error:', error);
         }
@@ -339,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function refreshRouteData() {
         const hash = window.location.hash.replace('#/', '').split('?')[0] || '';
-        if (hash === 'dashboard' || hash === 'explorer') {
+        if (hash === 'dashboard' || hash === 'explorer' || hash === 'history') {
             hydrateRoute(hash);
         }
     }
@@ -770,6 +771,204 @@ document.addEventListener('DOMContentLoaded', async () => {
             setText('dashboard-daily-credit', `+${formatCurrency(investment.daily_credit_usd)}`);
             setText('dashboard-projected-return', formatCurrency(investment.projected_return_usd, 0));
         }
+
+        renderDashboardProjects(dbProjects);
+    }
+
+    async function hydrateWithdrawalPage() {
+        const principalEl = document.getElementById('withdraw-active-principal');
+        const balanceEl = document.getElementById('withdraw-available-balance');
+        const listContainer = document.getElementById('personal-withdrawals-list');
+        const form = document.getElementById('withdraw-form');
+        const methodSelect = document.getElementById('withdraw-method');
+
+        if (!supabaseClient || !currentSession) return;
+
+        // 1. Fetch user profile/investment to show balances
+        const [investmentResult, withdrawalsResult] = await Promise.all([
+            supabaseClient
+                .from('qt_investments')
+                .select('principal_usd,daily_credit_usd,day_number,status')
+                .eq('status', 'active')
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle(),
+            supabaseClient
+                .from('qt_withdrawals')
+                .select('amount_usd,method,status,created_at')
+                .order('created_at', { ascending: false })
+        ]);
+
+        const investment = investmentResult?.data;
+        const withdrawals = withdrawalsResult?.data || [];
+
+        const principal = Number(investment?.principal_usd || 0);
+        const totalYield = Number(investment?.daily_credit_usd || 0) * Number(investment?.day_number || 0);
+        const totalWithdrawn = withdrawals
+            .filter(w => w.status === 'completed' || w.status === 'pending')
+            .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
+
+        const withdrawableBalance = Math.max(0, totalYield - totalWithdrawn);
+
+        if (principalEl) principalEl.textContent = formatCurrency(principal);
+        if (balanceEl) balanceEl.textContent = formatCurrency(withdrawableBalance);
+
+        // 2. Render user requests list
+        if (listContainer) {
+            if (withdrawalsResult.error) {
+                listContainer.innerHTML = `<p class="text-sm text-red-700 text-center py-8">Failed to load withdrawals: ${escapeHtml(withdrawalsResult.error.message)}</p>`;
+            } else if (withdrawals.length === 0) {
+                listContainer.innerHTML = `<p class="text-sm text-on-surface/40 text-center py-8">No pending or past withdrawal requests found.</p>`;
+            } else {
+                listContainer.innerHTML = withdrawals.map(w => {
+                    const statusClass = w.status === 'completed'
+                        ? 'text-primary bg-primary/10'
+                        : w.status === 'rejected'
+                            ? 'text-red-700 bg-red-50'
+                            : 'text-on-surface/50 bg-surface-container';
+                    const icon = w.method === 'bitcoin'
+                        ? 'currency_bitcoin'
+                        : w.method === 'bank_transfer'
+                            ? 'account_balance'
+                            : 'phone_android';
+                    const methodName = w.method === 'bitcoin'
+                        ? 'Bitcoin'
+                        : w.method === 'bank_transfer'
+                            ? 'Bank Transfer'
+                            : 'Mobile Money';
+
+                    return `
+                        <div class="py-5 flex items-center gap-4">
+                            <div class="w-11 h-11 rounded-2xl bg-surface-container flex items-center justify-center text-on-surface/65">
+                                <span class="material-symbols-outlined">${icon}</span>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-body font-bold text-on-surface/85">${escapeHtml(methodName)}</p>
+                                <p class="text-xs text-on-surface/40 font-semibold uppercase tracking-widest">${timeAgo(w.created_at)}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="font-display font-bold text-on-surface">${formatCurrency(w.amount_usd)}</p>
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusClass} mt-1">${w.status}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // 3. Set up dropdown toggle
+        if (methodSelect && !methodSelect.dataset.listenerBound) {
+            methodSelect.dataset.listenerBound = 'true';
+            methodSelect.addEventListener('change', () => {
+                const selectedMethod = methodSelect.value;
+                ['mobile_money', 'bank_transfer', 'bitcoin'].forEach(m => {
+                    const el = document.getElementById(`details-${m}`);
+                    if (el) {
+                        el.classList.toggle('hidden', m !== selectedMethod);
+                        el.querySelectorAll('input, select').forEach(input => {
+                            if (m === selectedMethod) {
+                                input.setAttribute('required', 'true');
+                            } else {
+                                input.removeAttribute('required');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // 4. Set up form submission handler
+        if (form && !form.dataset.listenerBound) {
+            form.dataset.listenerBound = 'true';
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                const amountInput = document.getElementById('withdraw-amount');
+                const amount = Number(amountInput?.value || 0);
+
+                if (!Number.isFinite(amount) || amount <= 0) {
+                    setWithdrawMessage('Please enter a valid amount.', 'error');
+                    return;
+                }
+
+                if (amount > withdrawableBalance) {
+                    setWithdrawMessage(`Withdrawal request exceeds your withdrawable yield balance of ${formatCurrency(withdrawableBalance)}.`, 'error');
+                    return;
+                }
+
+                if (amount < 5) {
+                    setWithdrawMessage('Minimum withdrawal amount is $5.00 USD.', 'error');
+                    return;
+                }
+
+                const method = methodSelect.value;
+                let details = {};
+
+                if (method === 'mobile_money') {
+                    details = {
+                        phone: document.getElementById('withdraw-phone')?.value || '',
+                        provider: document.getElementById('withdraw-provider')?.value || ''
+                    };
+                } else if (method === 'bank_transfer') {
+                    details = {
+                        bank_name: document.getElementById('withdraw-bank-name')?.value || '',
+                        account_number: document.getElementById('withdraw-bank-acc')?.value || '',
+                        account_name: document.getElementById('withdraw-bank-holder')?.value || ''
+                    };
+                } else if (method === 'bitcoin') {
+                    details = {
+                        btc_address: document.getElementById('withdraw-btc-address')?.value || ''
+                    };
+                }
+
+                setWithdrawState(true, 'Submitting payout request...');
+
+                const { error } = await supabaseClient
+                    .from('qt_withdrawals')
+                    .insert({
+                        user_id: currentSession.user.id,
+                        amount_usd: amount,
+                        method: method,
+                        details: details,
+                        status: 'pending'
+                    });
+
+                if (error) {
+                    setWithdrawState(false);
+                    setWithdrawMessage(error.message, 'error');
+                    return;
+                }
+
+                setWithdrawState(false);
+                setWithdrawMessage('Your withdrawal request has been submitted and is processing.', 'success');
+                form.reset();
+                // Refresh data
+                await hydrateWithdrawalPage();
+            });
+        }
+    }
+
+    function setWithdrawMessage(message, type = 'info') {
+        const messageEl = document.getElementById('withdraw-message');
+        if (messageEl) {
+            messageEl.textContent = message || '';
+            messageEl.className = 'min-h-5 text-sm font-semibold mt-2';
+            if (type === 'error') messageEl.classList.add('text-red-700');
+            else if (type === 'success') messageEl.classList.add('text-primary');
+            else messageEl.classList.add('text-on-surface/55');
+        }
+    }
+
+    function setWithdrawState(loading, message = '') {
+        const submit = document.querySelector('.withdraw-submit');
+        if (submit) {
+            submit.disabled = loading;
+            submit.classList.toggle('opacity-60', loading);
+            submit.classList.toggle('cursor-wait', loading);
+        }
+        if (loading) {
+            setWithdrawMessage(message, 'info');
+        }
+    }
 
         renderDashboardProjects(dbProjects);
     }
