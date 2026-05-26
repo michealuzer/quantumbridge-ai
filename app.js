@@ -466,19 +466,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const isCompounding = Boolean(calcCompound?.checked);
                 
                 const firstDayReturn = amount * dailyRate;
-                const finalBalance = isCompounding
-                    ? amount * Math.pow(1 + dailyRate, termDays)
-                    : amount + (firstDayReturn * termDays);
-                const totalReturn = finalBalance - amount;
+                const totalReturn = isCompounding
+                    ? (amount * Math.pow(1 + dailyRate, termDays)) - amount
+                    : firstDayReturn * termDays;
 
                 if (calcReturnLabel) calcReturnLabel.innerText = isCompounding ? 'First Day Yield' : 'Estimated Daily Yield';
                 calcDailyReturn.innerText = `+$${firstDayReturn.toFixed(2)}`;
                 calcTotalReturn.innerText = `+$${totalReturn.toFixed(2)}`;
-                if (calcFinalBalance) calcFinalBalance.innerText = `$${finalBalance.toFixed(2)}`;
+                if (calcFinalBalance) calcFinalBalance.innerText = `$${totalReturn.toFixed(2)}`;
                 if (calcLockNote) {
                     calcLockNote.textContent = isCompounding
-                        ? `Compounding locks funds and profits until the ${termDays}-day plan period ends, because daily yield is reinvested.`
-                        : 'Standard mode keeps profits flexible: your daily profit can be withdrawn while the plan remains active.';
+                        ? `Compounding locks yield until the ${termDays}-day plan period ends, because daily yield is reinvested. Principal remains committed and non-refundable.`
+                        : 'Standard mode keeps yield flexible: collected daily yield can be withdrawn while principal remains committed.';
                     calcLockNote.className = isCompounding
                         ? 'rounded-xl bg-on-surface text-white border border-on-surface/10 px-4 py-3 text-sm leading-6'
                         : 'rounded-xl bg-primary/10 border border-primary/15 px-4 py-3 text-sm text-on-surface/70 leading-6';
@@ -824,7 +823,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const projectedYield = Number(investment.projected_return_usd || 0) || (dailyCredit * durationDays);
             const collectedYield = dailyCredit * timing.completedDays;
             const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
-            const maturityValue = principal + projectedYield;
 
             setText('dashboard-collected-yield', formatCurrency(collectedYield));
             setText('dashboard-funded-balance', `Committed ${formatCurrency(principal)}`);
@@ -832,7 +830,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             setText('dashboard-day', timing.completedDays === 0 ? `First credit in ${timing.hoursUntilNextCredit}h` : `Day ${currentDay} of ${durationDays}`);
             setText('dashboard-daily-credit', `+${formatCurrency(todaysCredit)}`);
             setText('dashboard-projected-return', formatCurrency(projectedYield, 0));
-            setText('dashboard-maturity-value', formatCurrency(maturityValue, 0));
+            setText('dashboard-maturity-value', formatCurrency(projectedYield, 0));
             setText('dashboard-schedule-title', `${durationDays || ''}${durationDays ? '-Day ' : ''}Yield Schedule`);
         }
 
