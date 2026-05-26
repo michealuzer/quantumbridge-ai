@@ -835,7 +835,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         hydrateDashboardReferralSummary(profile, commissionResult.data || [], directResult.data || []);
-        renderDashboardProjects(dbProjects);
+        renderDashboardProjects(dbProjects, !!investment);
     }
 
     function hydrateDashboardReferralSummary(profile, commissions, directReferrals) {
@@ -1362,13 +1362,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         container.innerHTML = (data || []).map(renderProjectCard).join('');
     }
 
-    function renderDashboardProjects(projects) {
+    function renderDashboardProjects(projects, hasActivePlan) {
         const container = document.getElementById('dashboard-projects');
         if (!container) return;
 
+        const titleHeader = container.parentElement.querySelector('h3');
+
         if (!projects.length) {
-            container.innerHTML = `<div class="bg-surface-container p-4 rounded-2xl text-sm text-on-surface/50">No projects found for this account yet.</div>`;
-            return;
+            // Simulated authentic projects
+            projects = [
+                {
+                    symbol: 'Commercial Bridge Loan - TX',
+                    side: 'Senior Debt',
+                    placed_at: new Date(Date.now() - 1000 * 60 * 45).toISOString(), // 45 mins ago
+                    status: 'active'
+                },
+                {
+                    symbol: 'Multi-Family Refinance - FL',
+                    side: 'Mezzanine Debt',
+                    placed_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(), // 3 hours ago
+                    status: 'active'
+                },
+                {
+                    symbol: 'Industrial Acquisition - OH',
+                    side: 'Senior Debt',
+                    placed_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2).toISOString(), // 2 days ago
+                    status: 'active'
+                }
+            ];
+        }
+
+        if (titleHeader) {
+            titleHeader.textContent = hasActivePlan ? "Active Portfolio Allocation" : "Recent Platform Projects";
         }
 
         container.innerHTML = projects.map(project => `
