@@ -19,16 +19,19 @@
 
     <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
         <div class="bg-primary text-white p-6 rounded-[2rem] shadow-lg shadow-primary/10">
-            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Active Principal</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Available to Withdraw</span>
             <div id="withdraw-active-principal" class="font-display text-4xl font-bold mt-2">$0.00</div>
+            <p class="text-xs text-white/70 mt-2">Collected yield after pending payouts.</p>
+        </div>
+        <div class="bg-surface-container p-6 rounded-[2rem]">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Today's Credit</span>
+            <div id="withdraw-todays-credit" class="font-display text-4xl font-bold mt-2 text-on-surface">$0.00</div>
+            <p class="text-xs text-on-surface/50 mt-2">Added to withdrawable yield after the day closes.</p>
         </div>
         <div class="bg-surface-container p-6 rounded-[2rem]">
             <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Processing Window</span>
             <div class="font-display text-4xl font-bold mt-2 text-on-surface">24 Hours</div>
-        </div>
-        <div class="bg-surface-container p-6 rounded-[2rem]">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Withdrawal Fees</span>
-            <div class="font-display text-4xl font-bold mt-2 text-on-surface">0%</div>
+            <p class="text-xs text-on-surface/50 mt-2">No withdrawal fee.</p>
         </div>
     </section>
 

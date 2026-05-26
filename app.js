@@ -816,11 +816,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         setText('dashboard-plan-name', plan?.name || 'No active plan');
 
         if (investment) {
-            setText('dashboard-principal', formatCurrency(investment.principal_usd));
+            const principal = Number(investment.principal_usd || 0);
+            const dailyCredit = Number(investment.daily_credit_usd || 0);
+            const projectedYield = Number(investment.projected_return_usd || 0);
+            const currentDay = Math.max(Number(investment.day_number || 1), 1);
+            const durationDays = Math.max(Number(investment.duration_days || 0), 0);
+            const collectedYield = dailyCredit * Math.max(currentDay - 1, 0);
+            const maturityValue = principal + projectedYield;
+
+            setText('dashboard-collected-yield', formatCurrency(collectedYield));
+            setText('dashboard-funded-balance', `Funded ${formatCurrency(principal)}`);
             setText('dashboard-daily-percent', `${formatPercent(plan?.daily_return_percent || 0)} Daily Yield`);
-            setText('dashboard-day', `Day ${investment.day_number} of ${investment.duration_days}`);
-            setText('dashboard-daily-credit', `+${formatCurrency(investment.daily_credit_usd)}`);
-            setText('dashboard-projected-return', formatCurrency(investment.projected_return_usd, 0));
+            setText('dashboard-day', `Day ${currentDay} of ${durationDays}`);
+            setText('dashboard-daily-credit', `+${formatCurrency(dailyCredit)}`);
+            setText('dashboard-projected-return', formatCurrency(projectedYield, 0));
+            setText('dashboard-maturity-value', formatCurrency(maturityValue, 0));
+            setText('dashboard-schedule-title', `${durationDays || ''}${durationDays ? '-Day ' : ''}Yield Schedule`);
         }
 
         hydrateDashboardReferralSummary(profile, commissionResult.data || [], directResult.data || []);
@@ -929,6 +940,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function hydrateWithdrawalPage() {
         const principalEl = document.getElementById('withdraw-active-principal');
         const balanceEl = document.getElementById('withdraw-available-balance');
+        const todaysCreditEl = document.getElementById('withdraw-todays-credit');
         const listContainer = document.getElementById('personal-withdrawals-list');
         const form = document.getElementById('withdraw-form');
         const methodSelect = document.getElementById('withdraw-method');
@@ -958,16 +970,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         const investment = investmentResult?.data;
         const withdrawals = withdrawalsResult?.data || [];
 
-        const principal = Number(investment?.principal_usd || 0);
-        const totalYield = Number(investment?.daily_credit_usd || 0) * Number(investment?.day_number || 0);
+        const dailyCredit = Number(investment?.daily_credit_usd || 0);
+        const currentDay = Math.max(Number(investment?.day_number || 1), 1);
+        const completedDays = Math.max(currentDay - 1, 0);
+        const totalYield = dailyCredit * completedDays;
         const totalWithdrawn = withdrawals
             .filter(w => w.status === 'completed' || w.status === 'pending')
             .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
 
         const withdrawableBalance = Math.max(0, totalYield - totalWithdrawn);
 
-        if (principalEl) principalEl.textContent = formatCurrency(principal);
+        if (principalEl) principalEl.textContent = formatCurrency(withdrawableBalance);
         if (balanceEl) balanceEl.textContent = formatCurrency(withdrawableBalance);
+        if (todaysCreditEl) todaysCreditEl.textContent = `+${formatCurrency(dailyCredit)}`;
 
         // 2. Render user requests list
         if (listContainer) {
