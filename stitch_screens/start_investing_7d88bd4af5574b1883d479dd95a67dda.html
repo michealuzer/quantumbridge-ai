@@ -7,7 +7,7 @@
     <header class="mb-8">
         <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Load Account</span>
         <h1 class="font-display text-4xl md:text-6xl font-bold tracking-tight mt-3">Add Funds First</h1>
-        <p class="font-body text-on-surface/60 mt-3 max-w-2xl">Load your investor account, wait for the funds to reflect, then choose the package that matches your available balance.</p>
+        <p class="font-body text-on-surface/60 mt-3 max-w-2xl">Load your investor account, wait for the funds to reflect, then choose the package that matches your available balance. Deposited principal is committed to the selected fund and is not refundable; only earned yield can be withdrawn.</p>
     </header>
 
     <section class="grid grid-cols-1 lg:grid-cols-5 gap-6">
@@ -33,6 +33,11 @@
                     <p id="funding-usd-equivalent" class="text-sm text-on-surface/55 mt-1">USD equivalent: $10.00</p>
                 </div>
 
+                <div class="rounded-2xl border border-primary/15 bg-primary/10 p-4">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-primary">Principal Commitment</p>
+                    <p class="text-sm text-on-surface/70 mt-2 leading-6">Your deposited amount is non-refundable once confirmed. Withdrawals are paid from collected yield only.</p>
+                </div>
+
                 <button type="submit" class="funding-submit w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg shadow-primary/20">Load Account</button>
                 <p data-funding-message class="min-h-5 text-sm font-semibold text-on-surface/55"></p>
             </div>
@@ -41,7 +46,7 @@
         <aside class="lg:col-span-2 bg-primary text-white rounded-[2rem] p-8 shadow-xl shadow-primary/20">
             <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">Next Step</span>
             <div id="funding-projected-return" class="font-display text-4xl font-bold mt-3">Choose package after funding</div>
-            <p id="funding-summary" class="text-sm opacity-75 mt-5">Once the top up is confirmed, return to Plans and select any package your account balance can cover.</p>
+            <p id="funding-summary" class="text-sm opacity-75 mt-5">Once the top up is confirmed, return to Plans and select any package your account balance can cover. Principal is committed; payouts come from earned yield.</p>
             <a href="#/explorer" class="block w-full mt-8 py-4 bg-white text-primary rounded-xl font-bold text-center">View Plans</a>
             <p class="text-[11px] opacity-55 mt-4 leading-5">QuantumTrade does not collect card numbers or mobile money PINs.</p>
         </aside>

@@ -629,7 +629,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (submit) submit.disabled = isBelowMinimum;
 
         if (!selectedPlan) {
-            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} to your account first, then choose a package from Plans.`;
+            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} as committed, non-refundable principal, then choose a package from Plans.`;
             if (minimumEl) minimumEl.textContent = `Minimum account load: ${formatLocalFundingAmount(minLocalAmount, currency)}, about ${formatCurrency(minUsd)}.`;
             if (equivalentEl) {
                 equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
@@ -643,7 +643,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const projected = amount * (dailyPercent / 100) * days;
 
         if (projectedEl) projectedEl.textContent = `${currency} ${projected.toFixed(2)}`;
-        if (summaryEl) summaryEl.textContent = `${formatPercent(dailyPercent)} daily yield over ${days} days. Pesapal checkout will process ${currency} ${amount.toFixed(2)}.`;
+        if (summaryEl) summaryEl.textContent = `${formatPercent(dailyPercent)} daily yield over ${days} days. Pesapal checkout will process ${currency} ${amount.toFixed(2)} as committed, non-refundable principal.`;
         if (minimumEl) minimumEl.textContent = `Minimum account load: ${formatLocalFundingAmount(minLocalAmount, currency)}, about ${formatCurrency(minUsd)}.`;
         if (equivalentEl) {
             equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
@@ -827,7 +827,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const maturityValue = principal + projectedYield;
 
             setText('dashboard-collected-yield', formatCurrency(collectedYield));
-            setText('dashboard-funded-balance', `Funded ${formatCurrency(principal)}`);
+            setText('dashboard-funded-balance', `Committed ${formatCurrency(principal)}`);
             setText('dashboard-daily-percent', `${formatPercent(plan?.daily_return_percent || 0)} Daily Yield`);
             setText('dashboard-day', timing.completedDays === 0 ? `First credit in ${timing.hoursUntilNextCredit}h` : `Day ${currentDay} of ${durationDays}`);
             setText('dashboard-daily-credit', `+${formatCurrency(todaysCredit)}`);
