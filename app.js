@@ -780,7 +780,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             supabaseClient.from('qt_profiles').select('email,display_name,investor_code').maybeSingle(),
             supabaseClient
                 .from('qt_investments')
-                .select('principal_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,qt_plans(name,daily_return_percent)')
+                .select('principal_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,created_at,qt_plans(name,daily_return_percent)')
                 .eq('status', 'active')
                 .order('created_at', { ascending: false })
                 .limit(1)
@@ -817,18 +817,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (investment) {
             const principal = Number(investment.principal_usd || 0);
-            const dailyCredit = Number(investment.daily_credit_usd || 0);
-            const projectedYield = Number(investment.projected_return_usd || 0);
-            const currentDay = Math.max(Number(investment.day_number || 1), 1);
-            const durationDays = Math.max(Number(investment.duration_days || 0), 0);
-            const collectedYield = dailyCredit * Math.max(currentDay - 1, 0);
+            const dailyCredit = getInvestmentDailyCredit(investment, plan);
+            const timing = getInvestmentTiming(investment);
+            const currentDay = timing.currentDay;
+            const durationDays = timing.durationDays;
+            const projectedYield = Number(investment.projected_return_usd || 0) || (dailyCredit * durationDays);
+            const collectedYield = dailyCredit * timing.completedDays;
+            const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
             const maturityValue = principal + projectedYield;
 
             setText('dashboard-collected-yield', formatCurrency(collectedYield));
             setText('dashboard-funded-balance', `Funded ${formatCurrency(principal)}`);
             setText('dashboard-daily-percent', `${formatPercent(plan?.daily_return_percent || 0)} Daily Yield`);
-            setText('dashboard-day', `Day ${currentDay} of ${durationDays}`);
-            setText('dashboard-daily-credit', `+${formatCurrency(dailyCredit)}`);
+            setText('dashboard-day', timing.completedDays === 0 ? `First credit in ${timing.hoursUntilNextCredit}h` : `Day ${currentDay} of ${durationDays}`);
+            setText('dashboard-daily-credit', `+${formatCurrency(todaysCredit)}`);
             setText('dashboard-projected-return', formatCurrency(projectedYield, 0));
             setText('dashboard-maturity-value', formatCurrency(maturityValue, 0));
             setText('dashboard-schedule-title', `${durationDays || ''}${durationDays ? '-Day ' : ''}Yield Schedule`);
@@ -956,7 +958,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const [investmentResult, withdrawalsResult] = await Promise.all([
             supabaseClient
                 .from('qt_investments')
-                .select('principal_usd,daily_credit_usd,day_number,status')
+                .select('principal_usd,daily_credit_usd,day_number,duration_days,status,created_at,qt_plans(daily_return_percent)')
                 .eq('status', 'active')
                 .order('created_at', { ascending: false })
                 .limit(1)
@@ -970,10 +972,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const investment = investmentResult?.data;
         const withdrawals = withdrawalsResult?.data || [];
 
-        const dailyCredit = Number(investment?.daily_credit_usd || 0);
-        const currentDay = Math.max(Number(investment?.day_number || 1), 1);
-        const completedDays = Math.max(currentDay - 1, 0);
-        const totalYield = dailyCredit * completedDays;
+        const plan = investment?.qt_plans;
+        const dailyCredit = getInvestmentDailyCredit(investment, plan);
+        const timing = getInvestmentTiming(investment);
+        const totalYield = dailyCredit * timing.completedDays;
+        const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
         const totalWithdrawn = withdrawals
             .filter(w => w.status === 'completed' || w.status === 'pending')
             .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
@@ -982,7 +985,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (principalEl) principalEl.textContent = formatCurrency(withdrawableBalance);
         if (balanceEl) balanceEl.textContent = formatCurrency(withdrawableBalance);
-        if (todaysCreditEl) todaysCreditEl.textContent = `+${formatCurrency(dailyCredit)}`;
+        if (todaysCreditEl) todaysCreditEl.textContent = `+${formatCurrency(todaysCredit)}`;
 
         // 2. Render user requests list
         if (listContainer) {
@@ -1636,6 +1639,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             minimumFractionDigits: fractionDigits,
             maximumFractionDigits: fractionDigits
         }).format(Number(value || 0));
+    }
+
+    const investmentCreditDayMs = 24 * 60 * 60 * 1000;
+
+    function getInvestmentTiming(investment) {
+        const durationDays = Math.max(Number(investment?.duration_days || 0), 0);
+        const startedAt = Date.parse(investment?.created_at || '');
+        const elapsedMs = Number.isFinite(startedAt) ? Math.max(0, Date.now() - startedAt) : null;
+        const completedByClock = elapsedMs === null ? null : Math.floor(elapsedMs / investmentCreditDayMs);
+        const completedByStoredDay = Math.max(Number(investment?.day_number || 1) - 1, 0);
+        const completedDays = Math.min(durationDays || Number.MAX_SAFE_INTEGER, completedByClock ?? completedByStoredDay);
+        const currentDay = durationDays ? Math.min(durationDays, completedDays + 1) : completedDays + 1;
+        const hoursUntilNextCredit = elapsedMs === null
+            ? 24
+            : Math.max(1, Math.ceil((investmentCreditDayMs - (elapsedMs % investmentCreditDayMs)) / (60 * 60 * 1000)));
+
+        return {
+            completedDays,
+            currentDay,
+            durationDays,
+            hoursUntilNextCredit,
+        };
+    }
+
+    function getInvestmentDailyCredit(investment, plan) {
+        const storedCredit = Number(investment?.daily_credit_usd || 0);
+        if (storedCredit > 0) return storedCredit;
+
+        const principal = Number(investment?.principal_usd || 0);
+        const dailyPercent = Number(plan?.daily_return_percent || 0);
+        return principal * (dailyPercent / 100);
     }
 
     function formatPercent(value) {
