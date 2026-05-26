@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumTrade Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+</head>
+<body>
+    <main class="shell">
+        <section id="login-panel" class="login-panel">
+            <div>
+                <p class="eyebrow">QuantumTrade Back Office</p>
+                <h1>Admin Control</h1>
+                <p class="muted">Sign in with the owner account to manage payout requests, investor balances, and portfolio allocations.</p>
+            </div>
+            <form id="login-form" class="login-form">
+                <label>Email
+                    <input id="admin-email" type="email" autocomplete="email" required value="michealuzer@gmail.com">
+                </label>
+                <label>Password
+                    <input id="admin-password" type="password" autocomplete="current-password" required>
+                </label>
+                <button type="submit">Sign In</button>
+                <p id="login-message" class="form-message"></p>
+            </form>
+        </section>
+
+        <section id="admin-panel" class="admin-panel hidden">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">QuantumTrade Back Office</p>
+                    <h1>Operations Desk</h1>
+                </div>
+                <div class="topbar-actions">
+                    <span id="admin-session-email" class="session-email"></span>
+                    <button id="refresh-data" class="secondary-button" type="button">Refresh</button>
+                    <button id="logout-button" class="icon-button" type="button" title="Log out">
+                        <span class="material-symbols-outlined">logout</span>
+                    </button>
+                </div>
+            </header>
+
+            <section class="stats-grid">
+                <article>
+                    <span>Active Principal</span>
+                    <strong id="stat-principal">$0</strong>
+                </article>
+                <article>
+                    <span>Pending Payouts</span>
+                    <strong id="stat-pending">$0</strong>
+                </article>
+                <article>
+                    <span>Investors</span>
+                    <strong id="stat-investors">0</strong>
+                </article>
+                <article>
+                    <span>Portfolio Items</span>
+                    <strong id="stat-projects">0</strong>
+                </article>
+            </section>
+
+            <div class="grid">
+                <section class="panel wide">
+                    <div class="panel-head">
+                        <div>
+                            <p class="eyebrow">Withdrawals</p>
+                            <h2>Payout Queue</h2>
+                        </div>
+                        <span id="withdrawal-status" class="status-text"></span>
+                    </div>
+                    <div id="withdrawals-list" class="list"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <p class="eyebrow">Investor Plans</p>
+                            <h2>Adjust Account</h2>
+                        </div>
+                    </div>
+                    <form id="investment-form" class="stack-form">
+                        <label>Investment
+                            <select id="investment-select" required></select>
+                        </label>
+                        <label>Plan
+                            <select id="investment-plan" required></select>
+                        </label>
+                        <label>Principal USD
+                            <input id="investment-principal" type="number" min="1" step="0.01" required>
+                        </label>
+                        <div class="form-row">
+                            <label>Day
+                                <input id="investment-day" type="number" min="1" step="1" required>
+                            </label>
+                            <label>Status
+                                <select id="investment-status">
+                                    <option value="active">Active</option>
+                                    <option value="paused">Paused</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="withdrawn">Withdrawn</option>
+                                </select>
+                            </label>
+                        </div>
+                        <button type="submit">Update Investment</button>
+                        <p id="investment-message" class="form-message"></p>
+                    </form>
+                </section>
+
+                <section class="panel wide">
+                    <div class="panel-head">
+                        <div>
+                            <p class="eyebrow">Portfolio</p>
+                            <h2>Funded Projects</h2>
+                        </div>
+                    </div>
+                    <div id="projects-list" class="list compact"></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <p class="eyebrow">Portfolio</p>
+                            <h2>Add Project</h2>
+                        </div>
+                    </div>
+                    <form id="project-form" class="stack-form">
+                        <label>Investor
+                            <select id="project-user" required></select>
+                        </label>
+                        <label>Project Name
+                            <input id="project-symbol" type="text" placeholder="Commercial Bridge Loan - TX" required>
+                        </label>
+                        <div class="form-row">
+                            <label>Type
+                                <input id="project-side" type="text" value="senior debt" required>
+                            </label>
+                            <label>Yield %
+                                <input id="project-result" type="number" step="0.01" value="0">
+                            </label>
+                        </div>
+                        <div class="form-row">
+                            <label>Risk
+                                <input id="project-risk" type="text" value="secured" required>
+                            </label>
+                            <label>Status
+                                <input id="project-status" type="text" value="active" required>
+                            </label>
+                        </div>
+                        <button type="submit">Add Project</button>
+                        <p id="project-message" class="form-message"></p>
+                    </form>
+                </section>
+            </div>
+        </section>
+    </main>
+    <script src="admin.js"></script>
+</body>
+</html>
