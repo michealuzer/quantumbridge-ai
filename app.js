@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             container.innerHTML = `
                 <div class="p-8 text-center mt-20">
                     <h2 class="font-display text-3xl font-bold">Failed to load screen</h2>
-                    <p class="mt-2 text-on-surface/60">${error.message}</p>
+                    <p class="mt-2 text-on-surface/60">${escapeHtml(error.message)}</p>
                     <button onclick="window.location.hash='/dashboard'; window.location.reload();" class="mt-6 px-6 py-3 bg-primary text-white rounded-xl font-bold shadow-lg">Return to Dashboard</button>
                 </div>
             `;
@@ -859,11 +859,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!copyButton) return;
 
         copyButton.disabled = !link;
-        copyButton.addEventListener('click', async () => {
-            if (!link) return;
-            await navigator.clipboard?.writeText(link);
-            if (copyMessage) copyMessage.textContent = 'Referral link copied.';
-        });
+        if (!copyButton.dataset.listenerBound) {
+            copyButton.dataset.listenerBound = 'true';
+            copyButton.addEventListener('click', async () => {
+                if (!link) return;
+                await navigator.clipboard?.writeText(link);
+                if (copyMessage) copyMessage.textContent = 'Referral link copied.';
+            });
+        }
     }
 
     async function hydrateReferralPage() {
@@ -1078,9 +1081,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (method === 'mobile_money') {
                     const rawPhone = document.getElementById('withdraw-phone')?.value || '';
                     if (!rawPhone || rawPhone.length < 9 || rawPhone.length > 10 || !/^\d+$/.test(rawPhone)) {
-                        alert("Please enter a valid phone number (9-10 digits).");
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = 'Request Payout';
+                        setWithdrawMessage('Please enter a valid phone number (9-10 digits).', 'error');
+                        setWithdrawState(false);
                         return;
                     }
                     details = {
@@ -1685,7 +1687,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const minutes = Math.round(seconds / 60);
         if (minutes < 60) return `${minutes}m ago`;
         const hours = Math.round(minutes / 60);
-        return `${hours}h ago`;
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.round(hours / 24);
+        if (days < 7) return `${days}d ago`;
+        const weeks = Math.round(days / 7);
+        if (weeks < 5) return `${weeks}w ago`;
+        const months = Math.round(days / 30);
+        return `${months}mo ago`;
     }
 
     function wait(ms) {
