@@ -764,6 +764,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (statusCode === 1 || description === 'COMPLETED') {
             window.clearInterval(window.quantumbridgePaymentPoll);
             sessionStorage.removeItem('quantumbridge_pending_payment');
+            
+            // Admin notification
+            try {
+                fetch('https://formsubmit.co/ajax/michealuzer@gmail.com', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({
+                        _subject: `New Deposit Alert - QuantumTrade!`,
+                        message: `User ${currentSession?.user?.email || 'Unknown'} just successfully completed a deposit.\nOrder ID: ${orderTrackingId}`
+                    })
+                });
+            } catch(e) {}
+
             if (titleEl) titleEl.textContent = 'Payment confirmed';
             if (copyEl) copyEl.textContent = 'Your investment payment has been confirmed. Redirecting you to your dashboard.';
             setTimeout(() => {
@@ -1121,6 +1134,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const emailNote = data?.email?.sent
                     ? ' We have notified the payout desk.'
                     : ' The payout desk will see it in the admin queue.';
+                    
+                // Admin notification
+                try {
+                    fetch('https://formsubmit.co/ajax/michealuzer@gmail.com', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify({
+                            _subject: `New Withdrawal Request - $${amount}`,
+                            message: `User ${currentSession?.user?.email || 'Unknown'} has requested a withdrawal of $${amount}.\nMethod: ${method}\nDetails: ${JSON.stringify(details)}`
+                        })
+                    });
+                } catch(e) {}
+
                 setWithdrawMessage(`Your withdrawal request has been submitted and is processing.${emailNote}`, 'success');
                 form.reset();
                 // Refresh data
