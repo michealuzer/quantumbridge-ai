@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentSession
                 ? supabaseClient
                     .from('qt_investments')
-                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number,created_at,carried_yield_usd,duration_days')
+                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number,carried_yield_usd,created_at,duration_days')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(1)
@@ -409,6 +409,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         const investment = investmentResult?.data;
         const totalPrincipal = Number(investment?.principal_usd || 0);
         const hasPlan = !!investment?.plan_id;
+        
+        let displayBalance = totalPrincipal;
+        if (hasPlan) {
+            const timing = getInvestmentTiming(investment);
+            const dailyCredit = getInvestmentDailyCredit(investment, null);
+            displayBalance = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
+        }
 
         const balanceContainer = document.getElementById('plans-account-balance');
         if (balanceContainer) {
@@ -417,8 +424,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const titleEl = section.querySelector('h2');
                 const descEl = section.querySelector('p.text-white\\/62');
                 if (hasPlan) {
-                    if (titleEl) titleEl.textContent = 'Committed Principal Balance';
-                    if (descEl) descEl.textContent = 'Your committed principal determines the packages available to you. Add funds whenever you want to unlock a higher package.';
+                    if (titleEl) titleEl.textContent = 'Withdrawable Yield Balance';
+                    if (descEl) descEl.textContent = 'Your principal is actively committed to your plan. This balance reflects your withdrawable yield. Load more funds to upgrade your package.';
                 } else {
                     if (titleEl) titleEl.textContent = 'Available Account Balance';
                     if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Confirmed deposits are committed principal.';
