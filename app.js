@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentSession
                 ? supabaseClient
                     .from('qt_investments')
-                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number')
+                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number,created_at,carried_yield_usd,duration_days')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(1)
@@ -409,13 +409,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const investment = investmentResult?.data;
         const totalPrincipal = Number(investment?.principal_usd || 0);
         const hasPlan = !!investment?.plan_id;
-        
-        let displayBalance = totalPrincipal;
-        if (hasPlan) {
-            const currentDay = Math.max(Number(investment.day_number || 1), 1);
-            const dailyCredit = Number(investment.daily_credit_usd || 0);
-            displayBalance = dailyCredit * Math.max(currentDay - 1, 0);
-        }
 
         const balanceContainer = document.getElementById('plans-account-balance');
         if (balanceContainer) {
@@ -424,8 +417,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const titleEl = section.querySelector('h2');
                 const descEl = section.querySelector('p.text-white\\/62');
                 if (hasPlan) {
-                    if (titleEl) titleEl.textContent = 'Withdrawable Yield Balance';
-                    if (descEl) descEl.textContent = `Your principal of ${formatCurrency(totalPrincipal)} is actively committed to your plan. This balance reflects your withdrawable yield. Load more funds to upgrade your package.`;
+                    if (titleEl) titleEl.textContent = 'Committed Principal Balance';
+                    if (descEl) descEl.textContent = 'Your committed principal determines the packages available to you. Add funds whenever you want to unlock a higher package.';
                 } else {
                     if (titleEl) titleEl.textContent = 'Available Account Balance';
                     if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Confirmed deposits are committed principal.';
@@ -433,17 +426,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        setText('plans-account-balance', formatCurrency(displayBalance));
+        setText('plans-account-balance', formatCurrency(totalPrincipal));
 
         grid.innerHTML = (data || []).map(plan => {
             const minDeposit = Number(plan.min_deposit_usd || 0);
-            const canSelect = currentSession && totalPrincipal >= minDeposit;
+            const maxDeposit = plan.max_deposit_usd === null ? null : Number(plan.max_deposit_usd);
+            const isCurrentPlan = hasPlan && investment.plan_id === plan.id;
+            const isWithinRange = totalPrincipal >= minDeposit && (maxDeposit === null || totalPrincipal <= maxDeposit);
+            const amountToUnlock = Math.max(0, minDeposit - totalPrincipal);
+            const currentPlan = (data || []).find(item => item.id === investment?.plan_id);
+            const isUpgrade = Number(plan.min_deposit_usd || 0) > Number(currentPlan?.min_deposit_usd || 0);
             const actionClass = plan.featured ? 'bg-white text-primary' : 'bg-primary text-white';
             const action = !currentSession
                 ? `<a href="#/signup" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Create Account</a>`
-                : canSelect
-                    ? `<button type="button" data-select-plan="${escapeHtml(plan.slug)}" class="w-full mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Select Package</button>`
-                    : `<a href="#/onboarding" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Load Account</a>`;
+                : isCurrentPlan
+                    ? `<span class="block mt-7 px-5 py-3 rounded-xl font-bold text-center border ${plan.featured ? 'border-white/30 bg-white/10' : 'border-primary/20 bg-primary/10 text-primary'}">Current Package</span>`
+                    : isWithinRange
+                        ? `<button type="button" data-select-plan="${escapeHtml(plan.slug)}" class="w-full mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">${hasPlan ? (isUpgrade ? 'Upgrade Package' : 'Switch Package') : 'Select Package'}</button>`
+                        : `<a href="#/onboarding" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">${amountToUnlock > 0 ? `Add ${formatCurrency(amountToUnlock, 0)} to Unlock` : 'Choose Eligible Package'}</a>`;
 
             return `
             <article class="${plan.featured ? 'bg-primary/90 text-white shadow-xl shadow-primary/20 backdrop-blur-xl border border-white/20' : 'glass-panel'} rounded-[2rem] p-8 transition-transform hover:scale-[1.02] duration-300">
@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
 
         grid.querySelectorAll('[data-select-plan]').forEach(button => {
-            button.addEventListener('click', () => selectInvestmentPlan(button.dataset.selectPlan, data || [], investmentResult?.data));
+            button.addEventListener('click', () => selectInvestmentPlan(button.dataset.selectPlan, button));
         });
 
         // Bind Calculator Logic
@@ -683,27 +683,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function selectInvestmentPlan(slug, plans, investment) {
-        const plan = plans.find(item => item.slug === slug);
-        if (!plan || !investment?.id) return;
+    async function selectInvestmentPlan(slug, button) {
+        if (!slug || !supabaseClient) return;
 
-        const principal = Number(investment.principal_usd || 0);
-        const dailyCredit = principal * (Number(plan.daily_return_percent || 0) / 100);
-        const projectedReturn = dailyCredit * Number(plan.duration_days || 0);
+        const originalLabel = button?.textContent || 'Select Package';
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Activating...';
+            button.classList.add('opacity-60', 'cursor-wait');
+        }
 
-        const { error } = await supabaseClient
-            .from('qt_investments')
-            .update({
-                plan_id: plan.id,
-                duration_days: Number(plan.duration_days || 0),
-                daily_credit_usd: dailyCredit,
-                projected_return_usd: projectedReturn,
-                updated_at: new Date().toISOString()
-            })
-            .eq('id', investment.id);
+        const { data, error } = await supabaseClient.functions.invoke('select-investment-plan', {
+            body: { plan_slug: slug }
+        });
 
-        if (error) {
-            alert(`Could not select package: ${error.message}`);
+        if (error || data?.error) {
+            alert(data?.error || error?.message || 'Could not activate package.');
+            if (button) {
+                button.disabled = false;
+                button.textContent = originalLabel;
+                button.classList.remove('opacity-60', 'cursor-wait');
+            }
             return;
         }
 
@@ -819,7 +819,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             supabaseClient.from('qt_profiles').select('email,display_name,investor_code').maybeSingle(),
             supabaseClient
                 .from('qt_investments')
-                .select('principal_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,created_at,qt_plans(name,daily_return_percent)')
+                .select('principal_usd,carried_yield_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,created_at,qt_plans(name,daily_return_percent)')
                 .eq('status', 'active')
                 .order('created_at', { ascending: false })
                 .limit(1)
@@ -861,7 +861,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentDay = timing.currentDay;
             const durationDays = timing.durationDays;
             const projectedYield = Number(investment.projected_return_usd || 0) || (dailyCredit * durationDays);
-            const collectedYield = dailyCredit * timing.completedDays;
+            const collectedYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
             const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
 
             setText('dashboard-collected-yield', formatCurrency(collectedYield));
@@ -999,7 +999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const [investmentResult, withdrawalsResult] = await Promise.all([
             supabaseClient
                 .from('qt_investments')
-                .select('principal_usd,daily_credit_usd,day_number,duration_days,status,created_at,qt_plans(daily_return_percent)')
+                .select('principal_usd,carried_yield_usd,daily_credit_usd,day_number,duration_days,status,created_at,qt_plans(daily_return_percent)')
                 .eq('status', 'active')
                 .order('created_at', { ascending: false })
                 .limit(1)
@@ -1016,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const plan = investment?.qt_plans;
         const dailyCredit = getInvestmentDailyCredit(investment, plan);
         const timing = getInvestmentTiming(investment);
-        const totalYield = dailyCredit * timing.completedDays;
+        const totalYield = Number(investment?.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
         const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
         const totalWithdrawn = withdrawals
             .filter(w => w.status === 'completed' || w.status === 'pending')
