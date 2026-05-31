@@ -6,6 +6,7 @@ const state = {
     profiles: [],
     plans: [],
     investments: [],
+    wallets: [],
     projects: [],
     withdrawals: []
 };
@@ -41,6 +42,7 @@ function bindAuth() {
         state.profiles = [];
         state.plans = [];
         state.investments = [];
+        state.wallets = [];
         state.projects = [];
         state.withdrawals = [];
         await syncUi();
@@ -132,6 +134,7 @@ async function loadAdminData() {
     state.profiles = portfolioResult.profiles || [];
     state.plans = portfolioResult.plans || [];
     state.investments = portfolioResult.investments || [];
+    state.wallets = portfolioResult.wallets || [];
     state.projects = portfolioResult.projects || [];
     state.withdrawals = withdrawalResult.withdrawals || [];
 
@@ -155,8 +158,10 @@ function renderStats() {
     const pendingPayouts = state.withdrawals
         .filter((withdrawal) => withdrawal.status === 'pending')
         .reduce((sum, withdrawal) => sum + Number(withdrawal.amount_usd || 0), 0);
+    const availableFunds = state.wallets
+        .reduce((sum, wallet) => sum + Number(wallet.loaded_available_usd || 0) + Number(wallet.yield_available_usd || 0), 0);
 
-    $('stat-principal').textContent = formatUsd(activePrincipal, 0);
+    $('stat-principal').textContent = `${formatUsd(activePrincipal, 0)} committed · ${formatUsd(availableFunds, 0)} available`;
     $('stat-pending').textContent = formatUsd(pendingPayouts, 0);
     $('stat-investors').textContent = String(state.profiles.length);
     $('stat-projects').textContent = String(state.projects.length);
@@ -217,7 +222,7 @@ function renderInvestmentControls() {
 
     investmentSelect.innerHTML = state.investments.map((investment) => {
         const profile = investment.profile || {};
-        const label = `${profile.email || profile.investor_code || 'Investor'} · ${investment.plan?.name || 'No plan'} · ${formatUsd(investment.principal_usd, 0)}`;
+        const label = `${profile.email || profile.investor_code || 'Investor'} · ${investment.plan?.name || 'No plan'} · ${investment.mode || 'standard'} · ${formatUsd(investment.principal_usd, 0)}`;
         return `<option value="${escapeHtml(investment.id)}">${escapeHtml(label)}</option>`;
     }).join('');
 

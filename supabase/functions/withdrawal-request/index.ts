@@ -31,17 +31,12 @@ Deno.serve(async (req) => {
       .eq("user_id", userData.user.id)
       .maybeSingle();
 
-    const { data: withdrawal, error: insertError } = await supabase
-      .from("qt_withdrawals")
-      .insert({
-        user_id: userData.user.id,
-        amount_usd: amountUsd,
-        method,
-        details,
-        status: "pending",
-      })
-      .select("id,amount_usd,method,details,status,created_at")
-      .single();
+    const { data: withdrawal, error: insertError } = await supabase.rpc("qt_create_withdrawal", {
+      p_user_id: userData.user.id,
+      p_amount_usd: amountUsd,
+      p_method: method,
+      p_details: details,
+    });
 
     if (insertError) return jsonResponse({ error: insertError.message }, 400);
 

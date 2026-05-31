@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
 });
 
 async function listPortfolio(supabase: ReturnType<typeof getServiceClient>) {
-  const [profilesResult, plansResult, investmentsResult, projectsResult] = await Promise.all([
+  const [profilesResult, plansResult, investmentsResult, projectsResult, walletsResult] = await Promise.all([
     supabase
       .from("qt_profiles")
       .select("user_id,email,display_name,investor_code,created_at")
@@ -52,7 +52,7 @@ async function listPortfolio(supabase: ReturnType<typeof getServiceClient>) {
       .order("sort_order", { ascending: true }),
     supabase
       .from("qt_investments")
-      .select("id,user_id,plan_id,principal_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,created_at,updated_at")
+      .select("id,user_id,plan_id,principal_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,mode,credited_days,matures_at,matured_at,funded_from_yield_usd,funded_from_loaded_usd,created_at,updated_at")
       .order("created_at", { ascending: false })
       .limit(300),
     supabase
@@ -60,20 +60,26 @@ async function listPortfolio(supabase: ReturnType<typeof getServiceClient>) {
       .select("id,user_id,symbol,side,risk,result_percent,status,placed_at,created_at")
       .order("placed_at", { ascending: false })
       .limit(300),
+    supabase
+      .from("qt_wallets")
+      .select("user_id,loaded_available_usd,yield_available_usd,updated_at")
+      .limit(300),
   ]);
 
-  const error = profilesResult.error || plansResult.error || investmentsResult.error || projectsResult.error;
+  const error = profilesResult.error || plansResult.error || investmentsResult.error || projectsResult.error || walletsResult.error;
   if (error) return jsonResponse({ error: error.message }, 400);
 
   const profiles = profilesResult.data || [];
   const plans = plansResult.data || [];
   const profilesByUserId = new Map(profiles.map((profile) => [profile.user_id, profile]));
   const plansById = new Map(plans.map((plan) => [plan.id, plan]));
+  const walletsByUserId = new Map((walletsResult.data || []).map((wallet) => [wallet.user_id, wallet]));
 
   const investments = (investmentsResult.data || []).map((investment) => ({
     ...investment,
     profile: profilesByUserId.get(investment.user_id) || null,
     plan: plansById.get(investment.plan_id) || null,
+    wallet: walletsByUserId.get(investment.user_id) || null,
   }));
 
   const projects = (projectsResult.data || []).map((project) => ({
@@ -81,7 +87,7 @@ async function listPortfolio(supabase: ReturnType<typeof getServiceClient>) {
     profile: profilesByUserId.get(project.user_id) || null,
   }));
 
-  return jsonResponse({ profiles, plans, investments, projects });
+  return jsonResponse({ profiles, plans, investments, projects, wallets: walletsResult.data || [] });
 }
 
 async function createInvestment(supabase: ReturnType<typeof getServiceClient>, body: Record<string, unknown>) {

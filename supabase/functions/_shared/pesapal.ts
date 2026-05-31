@@ -1,5 +1,4 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-import { calculateCarriedYield, calculatePlanValues } from "./investment.ts";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -199,60 +198,12 @@ export async function creditInvestmentBalance(
 
   if (!creditLock?.id) return;
 
-  const { data: investment } = await supabase
-    .from("qt_investments")
-    .select("id,principal_usd,plan_id,carried_yield_usd,daily_credit_usd,duration_days,created_at")
-    .eq("user_id", payment.user_id)
-    .eq("status", "active")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (investment?.id) {
-    const principal = Number(investment.principal_usd || 0) + amount;
-    const { data: plan } = await supabase
-      .from("qt_plans")
-      .select("id,daily_return_percent,duration_days")
-      .eq("id", investment.plan_id || payment.plan_id)
-      .maybeSingle();
-    const computed = plan ? calculatePlanValues(principal, plan) : null;
-
-    await supabase
-      .from("qt_investments")
-      .update({
-        principal_usd: principal,
-        carried_yield_usd: calculateCarriedYield(investment),
-        daily_credit_usd: computed?.dailyCredit ?? Number(investment.daily_credit_usd || 0),
-        projected_return_usd: computed?.projectedReturn ?? 0,
-        duration_days: computed?.durationDays ?? Number(investment.duration_days || 0),
-        day_number: 1,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", investment.id);
-    await awardReferralCommissions(supabase, payment.id, payment.user_id, amount);
-    return;
-  }
-
-  const { data: plan } = payment.plan_id
-    ? await supabase
-      .from("qt_plans")
-      .select("daily_return_percent,duration_days")
-      .eq("id", payment.plan_id)
-      .maybeSingle()
-    : { data: null };
-  const computed = plan ? calculatePlanValues(amount, plan) : null;
-
-  await supabase.from("qt_investments").insert({
-    user_id: payment.user_id,
-    plan_id: payment.plan_id,
-    principal_usd: amount,
-    daily_credit_usd: computed?.dailyCredit ?? 0,
-    projected_return_usd: computed?.projectedReturn ?? 0,
-    duration_days: computed?.durationDays ?? 0,
-    day_number: 1,
-    status: "active",
+  const { error: walletError } = await supabase.rpc("qt_credit_loaded_wallet", {
+    p_user_id: payment.user_id,
+    p_amount_usd: amount,
+    p_reference_id: payment.id,
   });
+  if (walletError) throw new Error(walletError.message);
   await awardReferralCommissions(supabase, payment.id, payment.user_id, amount);
 }
 

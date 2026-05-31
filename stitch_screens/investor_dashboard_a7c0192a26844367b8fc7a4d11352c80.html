@@ -52,6 +52,29 @@
         </div>
     </section>
 
+    <section class="mb-12">
+        <div class="flex items-center justify-between gap-4 mb-5">
+            <div>
+                <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Portfolio Positions</span>
+                <h2 class="font-display text-3xl font-bold mt-2">Running Plans</h2>
+            </div>
+            <a href="#/explorer" class="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white">Add Position</a>
+        </div>
+        <div id="dashboard-active-positions" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <p class="text-sm text-on-surface/50">Loading active positions...</p>
+        </div>
+    </section>
+
+    <section class="mb-12">
+        <div class="flex items-center justify-between gap-4 mb-5">
+            <h2 class="font-display text-2xl font-bold">Portfolio History</h2>
+            <span class="text-[10px] font-bold uppercase tracking-widest text-on-surface/40">Completed</span>
+        </div>
+        <div id="dashboard-completed-positions" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <p class="text-sm text-on-surface/50">No matured positions yet.</p>
+        </div>
+    </section>
+
     <section class="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-6 mb-12">
         <div class="bg-surface-container-low rounded-[2rem] p-6 md:p-8 border border-outline-variant/30">
             <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5">

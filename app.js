@@ -380,29 +380,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    async function getPortfolioSummary() {
+        if (!currentSession || !supabaseClient) return null;
+        const { data, error } = await supabaseClient.functions.invoke('portfolio-summary', { body: {} });
+        if (error || data?.error) throw new Error(data?.error || error?.message || 'Could not load portfolio.');
+        return data;
+    }
+
     async function hydratePlans() {
         const grid = document.getElementById('plans-grid');
         if (!grid) return;
 
-        const [{ data, error }, investmentResult, withdrawalsResult] = await Promise.all([
+        const [{ data, error }, portfolio] = await Promise.all([
             supabaseClient
             .from('qt_plans')
             .select('id,slug,name,daily_return_percent,duration_days,min_deposit_usd,max_deposit_usd,description,featured,sort_order')
             .order('sort_order', { ascending: true }),
-            currentSession
-                ? supabaseClient
-                    .from('qt_investments')
-                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number,carried_yield_usd,created_at,duration_days')
-                    .eq('status', 'active')
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle()
-                : Promise.resolve({ data: null, error: null }),
-            currentSession
-                ? supabaseClient
-                    .from('qt_withdrawals')
-                    .select('amount_usd,status')
-                : Promise.resolve({ data: null, error: null })
+            currentSession ? getPortfolioSummary() : Promise.resolve(null)
         ]);
 
         if (error) {
@@ -410,24 +404,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        if (investmentResult?.error) console.error(investmentResult.error);
-        const investment = investmentResult?.data;
-        const totalPrincipal = Number(investment?.principal_usd || 0);
-        const hasPlan = !!investment?.plan_id;
-        
-        let displayBalance = totalPrincipal;
-        if (hasPlan) {
-            const timing = getInvestmentTiming(investment);
-            const dailyCredit = getInvestmentDailyCredit(investment, null);
-            const grossYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
-            
-            const withdrawals = withdrawalsResult?.data || [];
-            const totalWithdrawn = withdrawals
-                .filter(w => w.status === 'completed' || w.status === 'pending')
-                .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
-                
-            displayBalance = Math.max(0, grossYield - totalWithdrawn);
-        }
+        const availableBalance = Number(portfolio?.wallet?.available_balance_usd || 0);
+        const hasPlan = Boolean((portfolio?.investments || []).some(item => item.status === 'active'));
 
         const balanceContainer = document.getElementById('plans-account-balance');
         if (balanceContainer) {
@@ -436,8 +414,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const titleEl = section.querySelector('h2');
                 const descEl = section.querySelector('p.text-white\\/62');
                 if (hasPlan) {
-                    if (titleEl) titleEl.textContent = 'Investable Amount';
-                    if (descEl) descEl.textContent = 'Your principal is actively committed to your plan. This balance reflects your withdrawable yield. Load more funds to upgrade your package.';
+                    if (titleEl) titleEl.textContent = 'Available Balance';
+                    if (descEl) descEl.textContent = 'Use confirmed account loads and available yield to add another position. Your running plans continue on their original schedules.';
                 } else {
                     if (titleEl) titleEl.textContent = 'Available Account Balance';
                     if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Confirmed deposits are committed principal.';
@@ -445,24 +423,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        setText('plans-account-balance', formatCurrency(displayBalance));
+        setText('plans-account-balance', formatCurrency(availableBalance));
 
         grid.innerHTML = (data || []).map(plan => {
             const minDeposit = Number(plan.min_deposit_usd || 0);
-            const maxDeposit = plan.max_deposit_usd === null ? null : Number(plan.max_deposit_usd);
-            const isCurrentPlan = hasPlan && investment.plan_id === plan.id;
-            const isWithinRange = totalPrincipal >= minDeposit && (maxDeposit === null || totalPrincipal <= maxDeposit);
-            const amountToUnlock = Math.max(0, minDeposit - totalPrincipal);
-            const currentPlan = (data || []).find(item => item.id === investment?.plan_id);
-            const isUpgrade = Number(plan.min_deposit_usd || 0) > Number(currentPlan?.min_deposit_usd || 0);
+            const canSelect = availableBalance >= minDeposit;
+            const amountToUnlock = Math.max(0, minDeposit - availableBalance);
             const actionClass = plan.featured ? 'bg-white text-primary' : 'bg-primary text-white';
             const action = !currentSession
                 ? `<a href="#/signup" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Create Account</a>`
-                : isCurrentPlan
-                    ? `<span class="block mt-7 px-5 py-3 rounded-xl font-bold text-center border ${plan.featured ? 'border-white/30 bg-white/10' : 'border-primary/20 bg-primary/10 text-primary'}">Current Package</span>`
-                    : isWithinRange
-                        ? `<button type="button" data-select-plan="${escapeHtml(plan.slug)}" class="w-full mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">${hasPlan ? (isUpgrade ? 'Upgrade Package' : 'Switch Package') : 'Select Package'}</button>`
-                        : `<a href="#/onboarding" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">${amountToUnlock > 0 ? `Add ${formatCurrency(amountToUnlock, 0)} to Unlock` : 'Choose Eligible Package'}</a>`;
+                : canSelect
+                    ? `<button type="button" data-select-plan="${escapeHtml(plan.slug)}" class="w-full mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Open Position</button>`
+                    : `<a href="#/onboarding" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Add ${formatCurrency(amountToUnlock, 0)} to Unlock</a>`;
 
             return `
             <article class="${plan.featured ? 'bg-primary/90 text-white shadow-xl shadow-primary/20 backdrop-blur-xl border border-white/20' : 'glass-panel'} rounded-[2rem] p-8 transition-transform hover:scale-[1.02] duration-300">
@@ -609,7 +581,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const minUsd = Number(selectedPlan?.dataset?.min || 10);
             const amountUsd = convertFundingAmountToUsd(amount, currency);
             const minLocalAmount = getFundingMinimumForCurrency(currency, minUsd);
-            const planSlug = selectedPlan?.value || 'starter-fund';
 
             if (!Number.isFinite(amount) || amountUsd < minUsd) {
                 setFundingState(form, false, `Minimum account load is ${formatCurrency(minUsd, 0)} or ${formatLocalFundingAmount(minLocalAmount, currency)}.`, 'error');
@@ -620,7 +591,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const { data, error } = await supabaseClient.functions.invoke('pesapal-create-order', {
                 body: {
-                    plan_slug: planSlug,
                     amount,
                     currency,
                     amount_usd: amountUsd,
@@ -674,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (submit) submit.disabled = isBelowMinimum;
 
         if (!selectedPlan) {
-            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} as committed, non-refundable principal, then choose a package from Plans.`;
+            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} into your non-refundable available balance, then choose one or more packages from Plans.`;
             if (minimumEl) minimumEl.textContent = `Minimum account load: ${formatLocalFundingAmount(minLocalAmount, currency)}, about ${formatCurrency(minUsd)}.`;
             if (equivalentEl) {
                 equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
@@ -704,6 +674,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function selectInvestmentPlan(slug, button) {
         if (!slug || !supabaseClient) return;
+        const amount = Number(document.getElementById('plans-purchase-amount')?.value || 0);
+        const mode = String(document.getElementById('plans-purchase-mode')?.value || 'standard');
+        const messageEl = document.getElementById('plans-purchase-message');
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            if (messageEl) messageEl.textContent = 'Enter the amount you want to invest, then choose a package.';
+            return;
+        }
 
         const originalLabel = button?.textContent || 'Select Package';
         if (button) {
@@ -713,11 +691,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const { data, error } = await supabaseClient.functions.invoke('select-investment-plan', {
-            body: { plan_slug: slug }
+            body: { plan_slug: slug, amount_usd: amount, mode }
         });
 
         if (error || data?.error) {
-            alert(data?.error || error?.message || 'Could not activate package.');
+            if (messageEl) {
+                messageEl.textContent = data?.error || error?.message || 'Could not open position.';
+                messageEl.className = 'min-h-5 text-sm font-semibold text-red-700 mt-4';
+            }
             if (button) {
                 button.disabled = false;
                 button.textContent = originalLabel;
@@ -726,7 +707,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        window.location.hash = '/dashboard';
+        if (messageEl) {
+            messageEl.textContent = data?.message || 'Position opened.';
+            messageEl.className = 'min-h-5 text-sm font-semibold text-primary mt-4';
+        }
+        await hydratePlans();
     }
 
     function setFundingState(form, loading, message, type = 'info') {
@@ -834,15 +819,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function hydrateDashboard() {
         await syncPendingPaymentBeforeDashboard();
 
-        const [profileResult, investmentResult, projectsResult, commissionResult, directResult, withdrawalsResult] = await Promise.all([
+        const [profileResult, portfolio, projectsResult, commissionResult, directResult] = await Promise.all([
             supabaseClient.from('qt_profiles').select('email,display_name,investor_code').maybeSingle(),
-            supabaseClient
-                .from('qt_investments')
-                .select('principal_usd,carried_yield_usd,daily_credit_usd,projected_return_usd,day_number,duration_days,status,created_at,qt_plans(name,daily_return_percent)')
-                .eq('status', 'active')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle(),
+            getPortfolioSummary(),
             supabaseClient
                 .from('qt_projects')
                 .select('symbol,side,risk,result_percent,status,placed_at')
@@ -852,57 +831,76 @@ document.addEventListener('DOMContentLoaded', async () => {
                 .from('qt_referral_commissions')
                 .select('amount_usd')
                 .order('created_at', { ascending: false }),
-            supabaseClient
-                .from('qt_profiles')
-                .select('user_id')
-                .eq('referrer_user_id', currentSession.user.id),
-            supabaseClient
-                .from('qt_withdrawals')
-                .select('amount_usd,status')
+            supabaseClient.from('qt_profiles').select('user_id').eq('referrer_user_id', currentSession.user.id)
         ]);
 
         if (profileResult.error) console.error(profileResult.error);
-        if (investmentResult.error) console.error(investmentResult.error);
         if (projectsResult.error) console.error(projectsResult.error);
         if (commissionResult.error) console.error(commissionResult.error);
         if (directResult.error) console.error(directResult.error);
 
         const profile = profileResult.data;
-        const investment = investmentResult.data;
+        const investments = portfolio?.investments || [];
+        const activeInvestments = investments.filter(item => item.status === 'active');
+        const completedInvestments = investments.filter(item => item.status === 'completed');
         let dbProjects = projectsResult.data || [];
-        const plan = investment?.qt_plans;
+        const availableYield = Number(portfolio?.wallet?.yield_available_usd || 0);
+        const totalPrincipal = activeInvestments.reduce((sum, item) => sum + Number(item.principal_usd || 0), 0);
+        const todaysCredit = activeInvestments
+            .filter(item => item.mode === 'standard' && Number(item.credited_days || 0) > 0)
+            .reduce((sum, item) => sum + Number(item.daily_credit_usd || 0), 0);
+        const projectedYield = activeInvestments.reduce((sum, item) => sum + Number(item.projected_return_usd || 0), 0);
 
         setText('dashboard-investor-code', profile?.investor_code ? `QuantumTrade Investor: ${profile.investor_code}` : 'QuantumTrade Investor');
         setText('dashboard-display-name', profile?.display_name || profile?.email || 'QuantumTrade Client');
-        setText('dashboard-plan-name', plan?.name || 'No active plan');
-
-        if (investment) {
-            const principal = Number(investment.principal_usd || 0);
-            const dailyCredit = getInvestmentDailyCredit(investment, plan);
-            const timing = getInvestmentTiming(investment);
-            const currentDay = timing.currentDay;
-            const durationDays = timing.durationDays;
-            const projectedYield = Number(investment.projected_return_usd || 0) || (dailyCredit * durationDays);
-            const grossYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
-            const withdrawals = withdrawalsResult?.data || [];
-            const totalWithdrawn = withdrawals
-                .filter(w => w.status === 'completed' || w.status === 'pending')
-                .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
-            const collectedYield = Math.max(0, grossYield - totalWithdrawn);
-            const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
-
-            setText('dashboard-collected-yield', formatCurrency(collectedYield));
-            setText('dashboard-funded-balance', `Committed ${formatCurrency(principal)}`);
-            setText('dashboard-daily-percent', `${formatPercent(plan?.daily_return_percent || 0)} Daily Yield`);
-            setText('dashboard-day', timing.completedDays === 0 ? `First credit in ${timing.hoursUntilNextCredit}h` : `Day ${currentDay} of ${durationDays}`);
-            setText('dashboard-daily-credit', `+${formatCurrency(todaysCredit)}`);
-            setText('dashboard-projected-return', formatCurrency(projectedYield, 0));
-            setText('dashboard-maturity-value', formatCurrency(projectedYield, 0));
-            setText('dashboard-schedule-title', `${durationDays || ''}${durationDays ? '-Day ' : ''}Yield Schedule`);
-        }
+        setText('dashboard-plan-name', activeInvestments.length ? `${activeInvestments.length} active position${activeInvestments.length === 1 ? '' : 's'}` : 'No active positions');
+        setText('dashboard-collected-yield', formatCurrency(availableYield));
+        setText('dashboard-funded-balance', `Committed ${formatCurrency(totalPrincipal)}`);
+        setText('dashboard-daily-percent', `${activeInvestments.length} Running`);
+        setText('dashboard-day', `Available balance ${formatCurrency(portfolio?.wallet?.available_balance_usd || 0)}`);
+        setText('dashboard-daily-credit', `+${formatCurrency(todaysCredit)}`);
+        setText('dashboard-projected-return', formatCurrency(projectedYield, 0));
+        setText('dashboard-maturity-value', formatCurrency(projectedYield, 0));
+        setText('dashboard-schedule-title', 'Combined Yield Schedule');
+        renderDashboardPositions(activeInvestments, completedInvestments);
 
         hydrateDashboardReferralSummary(profile, commissionResult.data || [], directResult.data || []);
-        renderDashboardProjects(dbProjects, !!investment);
+        renderDashboardProjects(dbProjects, activeInvestments.length > 0);
+    }
+
+    function renderDashboardPositions(activeInvestments, completedInvestments) {
+        const activeContainer = document.getElementById('dashboard-active-positions');
+        const completedContainer = document.getElementById('dashboard-completed-positions');
+        if (activeContainer) {
+            activeContainer.innerHTML = activeInvestments.length
+                ? activeInvestments.map(renderPositionCard).join('')
+                : '<p class="text-sm text-on-surface/50">No running positions yet. Load funds and open your first package.</p>';
+        }
+        if (completedContainer) {
+            completedContainer.innerHTML = completedInvestments.length
+                ? completedInvestments.map(renderPositionCard).join('')
+                : '<p class="text-sm text-on-surface/50">No matured positions yet.</p>';
+        }
+    }
+
+    function renderPositionCard(investment) {
+        const plan = investment.qt_plans || {};
+        const timing = getInvestmentTiming(investment);
+        const modeLabel = investment.mode === 'compound' ? 'Compounding' : 'Standard';
+        return `
+            <article class="glass-panel rounded-[2rem] p-6 border border-outline-variant/30">
+                <div class="flex items-start justify-between gap-4">
+                    <div><p class="text-[10px] font-bold uppercase tracking-widest text-primary">${escapeHtml(modeLabel)}</p><h3 class="font-display text-2xl font-bold mt-2">${escapeHtml(plan.name || 'Investment Position')}</h3></div>
+                    <span class="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">${escapeHtml(investment.status)}</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3 mt-6">
+                    <div><p class="text-[10px] font-bold uppercase text-on-surface/40">Principal</p><p class="font-display text-xl font-bold">${formatCurrency(investment.principal_usd)}</p></div>
+                    <div><p class="text-[10px] font-bold uppercase text-on-surface/40">Daily Yield</p><p class="font-display text-xl font-bold">${formatCurrency(investment.daily_credit_usd)}</p></div>
+                    <div><p class="text-[10px] font-bold uppercase text-on-surface/40">Progress</p><p class="font-display text-xl font-bold">${timing.completedDays}/${timing.durationDays}</p></div>
+                </div>
+                <p class="text-xs text-on-surface/50 mt-5">${investment.mode === 'compound' ? 'Yield unlocks at maturity' : 'Yield credits after each full day'} · Matures ${formatDate(investment.matures_at)}</p>
+            </article>
+        `;
     }
 
     function hydrateDashboardReferralSummary(profile, commissions, directReferrals) {
@@ -1022,34 +1020,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!currentSession) return;
 
-        // 1. Fetch user profile/investment to show balances
-        const [investmentResult, withdrawalsResult] = await Promise.all([
-            supabaseClient
-                .from('qt_investments')
-                .select('principal_usd,carried_yield_usd,daily_credit_usd,day_number,duration_days,status,created_at,qt_plans(daily_return_percent)')
-                .eq('status', 'active')
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle(),
-            supabaseClient
-                .from('qt_withdrawals')
-                .select('amount_usd,method,status,created_at')
-                .order('created_at', { ascending: false })
-        ]);
-
-        const investment = investmentResult?.data;
-        const withdrawals = withdrawalsResult?.data || [];
-
-        const plan = investment?.qt_plans;
-        const dailyCredit = getInvestmentDailyCredit(investment, plan);
-        const timing = getInvestmentTiming(investment);
-        const totalYield = Number(investment?.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
-        const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
-        const totalWithdrawn = withdrawals
-            .filter(w => w.status === 'completed' || w.status === 'pending')
-            .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
-
-        const withdrawableBalance = Math.max(0, totalYield - totalWithdrawn);
+        const portfolio = await getPortfolioSummary();
+        const withdrawals = portfolio?.withdrawals || [];
+        const activeInvestments = (portfolio?.investments || []).filter(item => item.status === 'active');
+        const withdrawableBalance = Number(portfolio?.wallet?.yield_available_usd || 0);
+        const todaysCredit = activeInvestments
+            .filter(item => item.mode === 'standard' && Number(item.credited_days || 0) > 0)
+            .reduce((sum, item) => sum + Number(item.daily_credit_usd || 0), 0);
 
         if (principalEl) principalEl.textContent = formatCurrency(withdrawableBalance);
         if (balanceEl) balanceEl.textContent = formatCurrency(withdrawableBalance);
@@ -1754,6 +1731,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function formatPercent(value) {
         return `${Number(value || 0).toFixed(Number(value) % 1 === 0 ? 0 : 2)}%`;
+    }
+
+    function formatDate(value) {
+        if (!value) return 'after the plan term';
+        return new Intl.DateTimeFormat('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        }).format(new Date(value));
     }
 
     function capitalize(value) {

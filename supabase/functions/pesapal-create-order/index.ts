@@ -14,7 +14,6 @@ Deno.serve(async (req) => {
     if (userError || !userData.user) return jsonResponse({ error: "Invalid user session" }, 401);
 
     const body = await req.json();
-    const planSlug = String(body.plan_slug || body.planSlug || "starter-fund");
     const amount = Number(body.amount);
     const currency = String(body.currency || "KES").toUpperCase();
     const amountUsd = toUsdAmount(amount, currency);
@@ -27,23 +26,16 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "Unsupported currency selected." }, 400);
     }
 
-    const { data: plan, error: planError } = await supabase
-      .from("qt_plans")
-      .select("id,slug,name,min_deposit_usd")
-      .eq("slug", planSlug)
-      .maybeSingle();
-
-    if (planError || !plan) return jsonResponse({ error: "Selected fund was not found" }, 404);
-    const minDepositUsd = Number(plan.min_deposit_usd || 10);
+    const minDepositUsd = 10;
     if (amountUsd < minDepositUsd) {
-      return jsonResponse({ error: `Minimum for ${plan.name} is ${formatUsd(minDepositUsd)} or ${formatLocalAmount(minDepositUsd * currencyUsdRates[currency], currency)}` }, 400);
+      return jsonResponse({ error: `Minimum account load is ${formatUsd(minDepositUsd)} or ${formatLocalAmount(minDepositUsd * currencyUsdRates[currency], currency)}` }, 400);
     }
 
     const config = getConfig();
     const token = await getPesapalToken(config);
     const notificationId = await getOrRegisterIpn(config, token);
     const merchantReference = `QB-${crypto.randomUUID()}`;
-    const description = `QuantumBridge ${plan.name}`.slice(0, 100);
+    const description = "QuantumTrade account load";
     const billingAddress = body.billing_address || body.billingAddress || {};
     const preferredPaymentMethod = String(body.preferred_payment_method || body.preferredPaymentMethod || "");
 
@@ -83,7 +75,7 @@ Deno.serve(async (req) => {
 
     await supabase.from("qb_payments").insert({
       user_id: userData.user.id,
-      plan_id: plan.id,
+      plan_id: null,
       merchant_reference: merchantReference,
       order_tracking_id: order.order_tracking_id,
       currency,
