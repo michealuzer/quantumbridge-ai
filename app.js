@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        setText('plans-account-balance', formatCurrency(totalPrincipal));
+        setText('plans-account-balance', formatCurrency(displayBalance));
 
         grid.innerHTML = (data || []).map(plan => {
             const minDeposit = Number(plan.min_deposit_usd || 0);
