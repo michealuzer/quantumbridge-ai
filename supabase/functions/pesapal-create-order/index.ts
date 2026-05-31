@@ -1,4 +1,5 @@
 import { corsHeaders, getConfig, getOrRegisterIpn, getPesapalToken, getServiceClient, jsonResponse } from "../_shared/pesapal.ts";
+import { getExchangeRateQuote, normalizeCurrency } from "../_shared/exchange-rates.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
@@ -15,8 +16,10 @@ Deno.serve(async (req) => {
 
     const body = await req.json();
     const amount = Number(body.amount);
-    const currency = String(body.currency || "KES").toUpperCase();
-    const amountUsd = toUsdAmount(amount, currency);
+    const currency = normalizeCurrency(String(body.currency || "KES"));
+    const quote = await getExchangeRateQuote();
+    const exchangeRate = quote.rates[currency];
+    const amountUsd = amount / exchangeRate;
 
     if (!Number.isFinite(amount) || amount <= 0) {
       return jsonResponse({ error: "Amount must be greater than zero" }, 400);
@@ -28,7 +31,7 @@ Deno.serve(async (req) => {
 
     const minDepositUsd = 10;
     if (amountUsd < minDepositUsd) {
-      return jsonResponse({ error: `Minimum account load is ${formatUsd(minDepositUsd)} or ${formatLocalAmount(minDepositUsd * currencyUsdRates[currency], currency)}` }, 400);
+      return jsonResponse({ error: `Minimum account load is ${formatUsd(minDepositUsd)} or ${formatLocalAmount(minDepositUsd * exchangeRate, currency)}` }, 400);
     }
 
     const config = getConfig();
@@ -43,7 +46,6 @@ Deno.serve(async (req) => {
       id: merchantReference,
       currency,
       amount,
-      amount_usd: amountUsd,
       description,
       callback_url: config.callbackUrl,
       cancellation_url: config.cancellationUrl,
@@ -81,6 +83,9 @@ Deno.serve(async (req) => {
       currency,
       amount,
       amount_usd: amountUsd,
+      exchange_rate_usd: exchangeRate,
+      exchange_rate_source: quote.source,
+      exchange_rate_updated_at: quote.sourceUpdatedAt,
       description,
       pesapal_redirect_url: order.redirect_url,
       preferred_payment_method: preferredPaymentMethod,
@@ -100,18 +105,6 @@ Deno.serve(async (req) => {
 
 function phoneSafe(value: unknown) {
   return String(value || "").replace(/[^a-zA-Z0-9_.:-]/g, "").slice(0, 50);
-}
-
-const currencyUsdRates: Record<string, number> = {
-  USD: 1,
-  KES: 130,
-  UGX: 3700,
-};
-
-function toUsdAmount(amount: number, currency: string) {
-  const rate = currencyUsdRates[currency];
-  if (!rate) return Number.NaN;
-  return amount / rate;
 }
 
 function formatUsd(amount: number) {

@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
+import { fallbackToUsdAmount } from "./exchange-rates.ts";
 
 export const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -185,7 +186,7 @@ export async function creditInvestmentBalance(
 
   if (!isCompleted || wasCompleted || payment.balance_credited_at) return;
 
-  const amount = Number(payment.amount_usd || toUsdAmount(Number(payment.amount || 0), String(payment.currency || "USD")));
+  const amount = Number(payment.amount_usd || fallbackToUsdAmount(Number(payment.amount || 0), String(payment.currency || "USD")));
   if (!Number.isFinite(amount) || amount <= 0) return;
 
   const { data: creditLock } = await supabase
@@ -243,15 +244,4 @@ async function awardReferralCommissions(
 
     nextSourceUserId = beneficiaryUserId;
   }
-}
-
-const currencyUsdRates: Record<string, number> = {
-  USD: 1,
-  KES: 130,
-  UGX: 3700,
-};
-
-function toUsdAmount(amount: number, currency: string) {
-  const rate = currencyUsdRates[currency.toUpperCase()] || 1;
-  return amount / rate;
 }

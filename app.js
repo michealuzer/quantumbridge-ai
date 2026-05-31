@@ -513,6 +513,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const form = document.getElementById('funding-form');
         const planSelect = document.getElementById('funding-plan');
         if (!form || !supabaseClient) return;
+        await refreshFundingExchangeRates();
         if (!planSelect) {
             updateFundingPreview();
             return;
@@ -593,7 +594,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body: {
                     amount,
                     currency,
-                    amount_usd: amountUsd,
                     billing_address: {
                         email_address: email,
                         first_name: 'QuantumTrade',
@@ -1664,11 +1664,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         return url.toString();
     }
 
-    const currencyUsdRates = {
+    let currencyUsdRates = {
         USD: 1,
         KES: 130,
         UGX: 3700
     };
+    let currencyRatesUpdatedAt = '';
+    let currencyRatesAreFallback = true;
+
+    async function refreshFundingExchangeRates() {
+        const statusEl = document.getElementById('funding-rate-status');
+        try {
+            const { data, error } = await supabaseClient.functions.invoke('exchange-rates', {
+                method: 'GET'
+            });
+            if (error || !data?.rates) throw error || new Error('Rates unavailable');
+            currencyUsdRates = { ...currencyUsdRates, ...data.rates };
+            currencyRatesUpdatedAt = String(data.sourceUpdatedAt || data.fetchedAt || '');
+            currencyRatesAreFallback = Boolean(data.isFallback);
+        } catch (error) {
+            console.warn('Using fallback funding exchange rates:', error);
+        }
+
+        if (statusEl) {
+            const updatedAt = Date.parse(currencyRatesUpdatedAt);
+            const freshness = Number.isFinite(updatedAt)
+                ? new Intl.DateTimeFormat('en-US', { dateStyle: 'medium', timeStyle: 'short' }).format(updatedAt)
+                : 'temporarily estimated';
+            statusEl.textContent = currencyRatesAreFallback
+                ? `Exchange rate estimate: ${freshness}. Your final USD credit is fixed securely when checkout begins.`
+                : `Exchange rates refreshed ${freshness}. Your USD credit is fixed when checkout begins.`;
+        }
+        updateFundingPreview();
+    }
 
     function convertFundingAmountToUsd(amount, currency) {
         const rate = currencyUsdRates[String(currency || 'USD').toUpperCase()] || 1;
@@ -1676,7 +1704,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function getFundingMinimumForCurrency(currency, minUsd = 10) {
-        const rate = fundingUsdRates[String(currency || 'USD').toUpperCase()] || 1;
+        const rate = currencyUsdRates[String(currency || 'USD').toUpperCase()] || 1;
         return Number(minUsd || 10) * rate;
     }
 
