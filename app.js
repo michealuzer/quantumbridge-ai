@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             setTimeout(() => {
                 container.innerHTML = `<div class="w-full relative" id="injected-view">${doc.body.innerHTML}</div>`;
+                container.scrollTop = 0;
                 container.appendChild(loadingState);
                 interceptLinks();
                 bindAuthForms();
@@ -391,7 +392,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentSession
                 ? supabaseClient
                     .from('qt_investments')
-                    .select('id,principal_usd,status')
+                    .select('id,principal_usd,status,plan_id,daily_credit_usd,day_number')
                     .eq('status', 'active')
                     .order('created_at', { ascending: false })
                     .limit(1)
@@ -405,12 +406,38 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         if (investmentResult?.error) console.error(investmentResult.error);
-        const accountBalance = Number(investmentResult?.data?.principal_usd || 0);
-        setText('plans-account-balance', formatCurrency(accountBalance));
+        const investment = investmentResult?.data;
+        const totalPrincipal = Number(investment?.principal_usd || 0);
+        const hasPlan = !!investment?.plan_id;
+        
+        let displayBalance = totalPrincipal;
+        if (hasPlan) {
+            const currentDay = Math.max(Number(investment.day_number || 1), 1);
+            const dailyCredit = Number(investment.daily_credit_usd || 0);
+            displayBalance = dailyCredit * Math.max(currentDay - 1, 0);
+        }
+
+        const balanceContainer = document.getElementById('plans-account-balance');
+        if (balanceContainer) {
+            const section = balanceContainer.closest('section');
+            if (section) {
+                const titleEl = section.querySelector('h2');
+                const descEl = section.querySelector('p.text-white\\/62');
+                if (hasPlan) {
+                    if (titleEl) titleEl.textContent = 'Withdrawable Yield Balance';
+                    if (descEl) descEl.textContent = `Your principal of ${formatCurrency(totalPrincipal)} is actively committed to your plan. This balance reflects your withdrawable yield. Load more funds to upgrade your package.`;
+                } else {
+                    if (titleEl) titleEl.textContent = 'Available Account Balance';
+                    if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Confirmed deposits are committed principal.';
+                }
+            }
+        }
+
+        setText('plans-account-balance', formatCurrency(displayBalance));
 
         grid.innerHTML = (data || []).map(plan => {
             const minDeposit = Number(plan.min_deposit_usd || 0);
-            const canSelect = currentSession && accountBalance >= minDeposit;
+            const canSelect = currentSession && totalPrincipal >= minDeposit;
             const actionClass = plan.featured ? 'bg-white text-primary' : 'bg-primary text-white';
             const action = !currentSession
                 ? `<a href="#/signup" class="block mt-7 px-5 py-3 rounded-xl font-bold text-center ${actionClass} shadow-lg hover:opacity-90 transition-opacity">Create Account</a>`
@@ -1633,14 +1660,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         return url.toString();
     }
 
-    const fundingUsdRates = {
+    const currencyUsdRates = {
         USD: 1,
         KES: 130,
-        UGX: 3900,
+        UGX: 3700
     };
 
     function convertFundingAmountToUsd(amount, currency) {
-        const rate = fundingUsdRates[String(currency || 'USD').toUpperCase()] || 1;
+        const rate = currencyUsdRates[String(currency || 'USD').toUpperCase()] || 1;
         return Number(amount || 0) / rate;
     }
 

@@ -113,7 +113,7 @@ function phoneSafe(value: unknown) {
 const currencyUsdRates: Record<string, number> = {
   USD: 1,
   KES: 130,
-  UGX: 3900,
+  UGX: 3700,
 };
 
 function toUsdAmount(amount: number, currency: string) {
