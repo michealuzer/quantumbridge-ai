@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const grid = document.getElementById('plans-grid');
         if (!grid) return;
 
-        const [{ data, error }, investmentResult] = await Promise.all([
+        const [{ data, error }, investmentResult, withdrawalsResult] = await Promise.all([
             supabaseClient
             .from('qt_plans')
             .select('id,slug,name,daily_return_percent,duration_days,min_deposit_usd,max_deposit_usd,description,featured,sort_order')
@@ -397,6 +397,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     .order('created_at', { ascending: false })
                     .limit(1)
                     .maybeSingle()
+                : Promise.resolve({ data: null, error: null }),
+            currentSession
+                ? supabaseClient
+                    .from('qt_withdrawals')
+                    .select('amount_usd,status')
                 : Promise.resolve({ data: null, error: null })
         ]);
 
@@ -414,7 +419,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (hasPlan) {
             const timing = getInvestmentTiming(investment);
             const dailyCredit = getInvestmentDailyCredit(investment, null);
-            displayBalance = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
+            const grossYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
+            
+            const withdrawals = withdrawalsResult?.data || [];
+            const totalWithdrawn = withdrawals
+                .filter(w => w.status === 'completed' || w.status === 'pending')
+                .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
+                
+            displayBalance = Math.max(0, grossYield - totalWithdrawn);
         }
 
         const balanceContainer = document.getElementById('plans-account-balance');
@@ -822,7 +834,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function hydrateDashboard() {
         await syncPendingPaymentBeforeDashboard();
 
-        const [profileResult, investmentResult, projectsResult, commissionResult, directResult] = await Promise.all([
+        const [profileResult, investmentResult, projectsResult, commissionResult, directResult, withdrawalsResult] = await Promise.all([
             supabaseClient.from('qt_profiles').select('email,display_name,investor_code').maybeSingle(),
             supabaseClient
                 .from('qt_investments')
@@ -843,7 +855,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             supabaseClient
                 .from('qt_profiles')
                 .select('user_id')
-                .eq('referrer_user_id', currentSession.user.id)
+                .eq('referrer_user_id', currentSession.user.id),
+            supabaseClient
+                .from('qt_withdrawals')
+                .select('amount_usd,status')
         ]);
 
         if (profileResult.error) console.error(profileResult.error);
@@ -868,7 +883,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentDay = timing.currentDay;
             const durationDays = timing.durationDays;
             const projectedYield = Number(investment.projected_return_usd || 0) || (dailyCredit * durationDays);
-            const collectedYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
+            const grossYield = Number(investment.carried_yield_usd || 0) + (dailyCredit * timing.completedDays);
+            const withdrawals = withdrawalsResult?.data || [];
+            const totalWithdrawn = withdrawals
+                .filter(w => w.status === 'completed' || w.status === 'pending')
+                .reduce((acc, curr) => acc + Number(curr.amount_usd || 0), 0);
+            const collectedYield = Math.max(0, grossYield - totalWithdrawn);
             const todaysCredit = timing.completedDays > 0 ? dailyCredit : 0;
 
             setText('dashboard-collected-yield', formatCurrency(collectedYield));
