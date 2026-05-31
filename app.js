@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const titleEl = section.querySelector('h2');
                 const descEl = section.querySelector('p.text-white\\/62');
                 if (hasPlan) {
-                    if (titleEl) titleEl.textContent = 'Withdrawable Yield Balance';
+                    if (titleEl) titleEl.textContent = 'Investable Amount';
                     if (descEl) descEl.textContent = 'Your principal is actively committed to your plan. This balance reflects your withdrawable yield. Load more funds to upgrade your package.';
                 } else {
                     if (titleEl) titleEl.textContent = 'Available Account Balance';
