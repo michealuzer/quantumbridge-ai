@@ -3,99 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QuantumTrade | Real Estate Debt Investing</title>
-    <!-- Default Tailwind Config for Control Panel and Loading States -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script>
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    colors: {
-                        "primary": "#006d32",
-                        "primary-container": "#00d166",
-                        "secondary": "#0061a4",
-                        "secondary-container": "#d1e4ff",
-                        "surface": "#f8f9ff",
-                        "on-surface": "#0b1c30",
-                        "surface-container-low": "#eff4ff",
-                        "surface-container": "#e5eeff",
-                        "surface-container-highest": "#d3e4fe",
-                        "outline-variant": "#bbcbb9"
-                    },
-                    fontFamily: {
-                        "display": ["Space Grotesk", "sans-serif"],
-                        "body": ["Inter", "sans-serif"]
-                    }
-                }
-            }
-        };
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="control-panel.css?v=2">
+    <title>QuantumTrade | Maintenance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --green: #00d166;
+            --deep: #050b08;
+            --panel: rgba(255, 255, 255, 0.1);
+            --line: rgba(255, 255, 255, 0.18);
+            --text: #f6fff9;
+            --muted: rgba(246, 255, 249, 0.72);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100dvh;
+            margin: 0;
+            display: grid;
+            place-items: center;
+            padding: 28px;
+            background:
+                linear-gradient(120deg, rgba(0, 0, 0, 0.94), rgba(0, 50, 26, 0.76)),
+                url("https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2200") center / cover;
+            color: var(--text);
+            font-family: Inter, system-ui, sans-serif;
+        }
+
+        main {
+            width: min(560px, 100%);
+            padding: 34px;
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            background: var(--panel);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.38);
+            backdrop-filter: blur(18px);
+        }
+
+        .eyebrow {
+            margin: 0 0 18px;
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-family: "Space Grotesk", Inter, sans-serif;
+            font-size: clamp(36px, 8vw, 62px);
+            line-height: 0.98;
+            letter-spacing: 0;
+        }
+
+        p {
+            margin: 20px 0 0;
+            color: var(--muted);
+            font-size: 17px;
+            line-height: 1.65;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 28px;
+            padding: 12px 16px;
+            border: 1px solid rgba(0, 209, 102, 0.34);
+            border-radius: 999px;
+            background: rgba(0, 209, 102, 0.12);
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        .dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 999px;
+            background: var(--green);
+            box-shadow: 0 0 20px rgba(0, 209, 102, 0.9);
+        }
+    </style>
 </head>
-<body class="bg-surface text-on-surface antialiased overflow-hidden m-0 p-0 w-screen h-[100dvh] flex relative font-body">
-
-    <!-- Real Estate Cinematic Background -->
-    <div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-on-surface">
-        <div class="absolute inset-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2200')] bg-cover bg-center opacity-52"></div>
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_75%_20%,rgba(0,209,102,0.22),transparent_28%),linear-gradient(90deg,rgba(3,7,12,0.96),rgba(3,7,12,0.82)_44%,rgba(3,7,12,0.62)),linear-gradient(0deg,rgba(3,7,12,0.98),rgba(3,7,12,0.52))] backdrop-blur-[2px]"></div>
-        
-        <!-- Grain Texture -->
-        <div class="absolute inset-0 opacity-[0.03] mix-blend-overlay" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E');"></div>
-    </div>
-
-    <!-- Active Screen Container -->
-    <div id="screen-container" class="w-full h-full relative overflow-y-auto overflow-x-hidden transition-opacity duration-300 opacity-100 pb-32 md:pb-24">
-        <!-- Injected Content Will Go Here -->
-        <div id="loading-state" class="fixed inset-0 flex flex-col items-center justify-center bg-surface z-[100] transition-opacity duration-300">
-            <div class="w-12 h-12 border-2 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="font-display font-bold text-xs tracking-[0.2em] text-primary-container uppercase">QuantumTrade Investor Access</p>
-        </div>
-    </div>
-
-    <!-- Responsive Navigation (Control Panel) -->
-    <!-- Mobile: Bottom Bar | Desktop: Floating Top -->
-    <nav id="control-panel" class="fixed bottom-5 left-1/2 -translate-x-1/2 md:bottom-auto md:top-6 md:w-auto z-[999] glass-panel rounded-full px-2 py-2 md:px-3 md:py-2 flex items-center justify-center gap-1 md:gap-1.5 shadow-2xl transition-all duration-500 transform opacity-0 translate-y-[20px] md:translate-y-[-20px]">
-        
-        <a href="#/landing" data-home-nav class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">home</span>
-            <span data-home-nav-label class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Home</span>
-        </a>
-
-        <a href="#/explorer" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">payments</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Plan</span>
-        </a>
-
-        <a href="#/insights" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">insights</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Security</span>
-        </a>
-        
-        <a href="#/onboarding" class="cp-link nav-secondary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">account_balance</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Start</span>
-        </a>
-
-        <a href="#/elite_tier" class="cp-link nav-secondary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">group_add</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Referrals</span>
-        </a>
-
-        <a href="#/history" class="cp-link nav-primary flex flex-col md:flex-row items-center gap-1 md:gap-2 text-on-surface/50 hover:text-primary transition-all group shrink-0">
-            <span class="material-symbols-outlined text-[24px] md:text-[20px]">account_balance_wallet</span>
-            <span class="text-[10px] md:text-sm font-semibold uppercase tracking-wider">Withdraw</span>
-        </a>
-
-    </nav>
-
-    <!-- Hidden toggle button when panel is collapsed (Legacy) -->
-    <button id="show-panel" class="hidden"></button>
-
-    <script src="vendor/supabase.min.js"></script>
-    <script src="auth-config.js"></script>
-    <script src="app.js?v=2"></script>
+<body>
+    <main>
+        <p class="eyebrow">QuantumTrade</p>
+        <h1>Investor access is temporarily paused.</h1>
+        <p>We are completing payment account maintenance. Account loading and investor dashboard access will resume after verification is complete.</p>
+        <div class="status"><span class="dot"></span> Maintenance in progress</div>
+    </main>
 </body>
 </html>
