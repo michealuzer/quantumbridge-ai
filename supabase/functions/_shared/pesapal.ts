@@ -84,6 +84,9 @@ export async function getPesapalToken(config: PesapalConfig) {
 export async function getOrRegisterIpn(config: PesapalConfig, token: string) {
   if (config.ipnId) return config.ipnId;
 
+  const existingIpnId = await getExistingIpnId(config, token);
+  if (existingIpnId) return existingIpnId;
+
   const response = await fetch(`${config.baseUrl}/api/URLSetup/RegisterIPN`, {
     method: "POST",
     headers: {
@@ -103,6 +106,29 @@ export async function getOrRegisterIpn(config: PesapalConfig, token: string) {
   }
 
   return data.ipn_id as string;
+}
+
+async function getExistingIpnId(config: PesapalConfig, token: string) {
+  const response = await fetch(`${config.baseUrl}/api/URLSetup/GetIpnList`, {
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) return "";
+
+  const data = await response.json();
+  const records = Array.isArray(data) ? data : Array.isArray(data?.ipn_list) ? data.ipn_list : [];
+  const match = records.find((record: Record<string, unknown>) => {
+    const url = String(record.url || "").trim();
+    const method = String(record.ipn_notification_type_description || record.notification_type || "").toUpperCase();
+    const status = String(record.ipn_status_description || record.status || "ACTIVE").toUpperCase();
+    return url === config.ipnUrl && method !== "GET" && status !== "INACTIVE";
+  });
+
+  return String(match?.ipn_id || "");
 }
 
 export async function getTransactionStatus(config: PesapalConfig, token: string, orderTrackingId: string) {

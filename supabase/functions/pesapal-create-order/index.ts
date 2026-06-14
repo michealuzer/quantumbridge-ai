@@ -72,10 +72,11 @@ Deno.serve(async (req) => {
 
     const order = await response.json();
     if (!response.ok || !order.redirect_url) {
+      console.error("Pesapal order creation failed", order);
       return jsonResponse({ error: order?.message || order?.error?.message || "Pesapal order creation failed", details: order }, 502);
     }
 
-    await supabase.from("qb_payments").insert({
+    const { error: paymentError } = await supabase.from("qb_payments").insert({
       user_id: userData.user.id,
       plan_id: null,
       merchant_reference: merchantReference,
@@ -92,6 +93,10 @@ Deno.serve(async (req) => {
       billing_address: orderPayload.billing_address,
       raw_order_response: order,
     });
+    if (paymentError) {
+      console.error("Payment record insert failed", paymentError);
+      return jsonResponse({ error: "Checkout was created but the payment record could not be saved. Please contact support before retrying.", details: paymentError }, 500);
+    }
 
     return jsonResponse({
       merchant_reference: merchantReference,

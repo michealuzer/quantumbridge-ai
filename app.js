@@ -603,7 +603,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             if (error || data?.error) {
-                setFundingState(form, false, data?.error || error?.message || 'Could not create Pesapal checkout.', 'error');
+                const message = await getFunctionErrorMessage(error, data, 'Could not create Pesapal checkout.');
+                setFundingState(form, false, message, 'error');
                 return;
             }
 
@@ -1662,6 +1663,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         url.search = '';
         url.hash = `/signup?ref=${encodeURIComponent(code)}`;
         return url.toString();
+    }
+
+    async function getFunctionErrorMessage(error, data, fallback) {
+        if (data?.error) return investorPaymentErrorMessage(data);
+        if (error?.context && typeof error.context.json === 'function') {
+            try {
+                return investorPaymentErrorMessage(await error.context.json());
+            } catch (_) {
+                // Fall through to the generic message below.
+            }
+        }
+        return error?.message && !String(error.message).includes('non-2xx')
+            ? error.message
+            : fallback;
+    }
+
+    function investorPaymentErrorMessage(payload) {
+        const code = payload?.details?.error?.code || payload?.details?.code;
+        if (code === 'general_system_decline_error') {
+            return 'Pesapal is declining checkout right now. Please try again in a few minutes or contact support if it continues.';
+        }
+        return payload?.error || payload?.message || 'Could not create Pesapal checkout.';
     }
 
     let currencyUsdRates = {
