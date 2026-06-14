@@ -41,6 +41,7 @@ Deno.serve(async (req) => {
     const description = "QuantumTrade account load";
     const billingAddress = body.billing_address || body.billingAddress || {};
     const preferredPaymentMethod = String(body.preferred_payment_method || body.preferredPaymentMethod || "");
+    const defaultCountryCode = currency === "UGX" ? "UG" : currency === "KES" ? "KE" : "UG";
 
     const orderPayload = {
       id: merchantReference,
@@ -53,8 +54,8 @@ Deno.serve(async (req) => {
       billing_address: {
         email_address: billingAddress.email_address || userData.user.email,
         phone_number: billingAddress.phone_number || "",
-        country_code: billingAddress.country_code || "KE",
-        first_name: billingAddress.first_name || "QuantumBridge",
+        country_code: billingAddress.country_code || defaultCountryCode,
+        first_name: billingAddress.first_name || "QuantumTrade",
         last_name: billingAddress.last_name || "Investor",
       },
       account_number: phoneSafe(billingAddress.phone_number || userData.user.id),
