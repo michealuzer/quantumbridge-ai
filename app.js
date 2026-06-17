@@ -418,7 +418,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (descEl) descEl.textContent = 'Use confirmed account loads and available yield to add another position. Your running plans continue on their original schedules.';
                 } else {
                     if (titleEl) titleEl.textContent = 'Available Account Balance';
-                    if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Confirmed deposits are committed principal.';
+                    if (descEl) descEl.textContent = 'Load your account first. Once funds reflect on your balance, packages unlock automatically based on the minimum required amount. Principal is locked during each plan and returns at maturity.';
                 }
             }
         }
@@ -494,8 +494,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (calcFinalBalance) calcFinalBalance.innerText = `$${totalReturn.toFixed(2)}`;
                 if (calcLockNote) {
                     calcLockNote.textContent = isCompounding
-                        ? `Compounding locks yield until the ${termDays}-day plan period ends, because daily yield is reinvested. Principal remains committed and non-refundable.`
-                        : 'Standard mode keeps yield flexible: collected daily yield can be withdrawn while principal remains committed.';
+                        ? `Compounding locks yield until the ${termDays}-day plan period ends, because daily yield is reinvested. Principal returns to available balance at maturity.`
+                        : 'Standard mode keeps yield flexible: collected daily yield can be withdrawn while principal unlocks at maturity.';
                     calcLockNote.className = isCompounding
                         ? 'rounded-xl bg-on-surface text-white border border-on-surface/10 px-4 py-3 text-sm leading-6'
                         : 'rounded-xl bg-primary/10 border border-primary/15 px-4 py-3 text-sm text-on-surface/70 leading-6';
@@ -645,7 +645,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (submit) submit.disabled = isBelowMinimum;
 
         if (!selectedPlan) {
-            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} into your non-refundable available balance, then choose one or more packages from Plans.`;
+            if (summaryEl) summaryEl.textContent = `Load ${formatLocalFundingAmount(amount, currency)} into your available balance, then choose one or more packages from Plans.`;
             if (minimumEl) minimumEl.textContent = `Minimum account load: ${formatLocalFundingAmount(minLocalAmount, currency)}, about ${formatCurrency(minUsd)}.`;
             if (equivalentEl) {
                 equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
@@ -659,7 +659,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const projected = amount * (dailyPercent / 100) * days;
 
         if (projectedEl) projectedEl.textContent = `${currency} ${projected.toFixed(2)}`;
-        if (summaryEl) summaryEl.textContent = `${formatPercent(dailyPercent)} daily yield over ${days} days. Pesapal checkout will process ${currency} ${amount.toFixed(2)} as committed, non-refundable principal.`;
+        if (summaryEl) summaryEl.textContent = `${formatPercent(dailyPercent)} daily yield over ${days} days. Principal is locked during the plan and returns to available balance at maturity.`;
         if (minimumEl) minimumEl.textContent = `Minimum account load: ${formatLocalFundingAmount(minLocalAmount, currency)}, about ${formatCurrency(minUsd)}.`;
         if (equivalentEl) {
             equivalentEl.textContent = `USD equivalent: ${formatCurrency(amountUsd)}${isBelowMinimum ? ' - below minimum' : ''}`;
@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div><p class="text-[10px] font-bold uppercase text-on-surface/40">Daily Yield</p><p class="font-display text-xl font-bold">${formatCurrency(investment.daily_credit_usd)}</p></div>
                     <div><p class="text-[10px] font-bold uppercase text-on-surface/40">Progress</p><p class="font-display text-xl font-bold">${timing.completedDays}/${timing.durationDays}</p></div>
                 </div>
-                <p class="text-xs text-on-surface/50 mt-5">${investment.mode === 'compound' ? 'Yield unlocks at maturity' : 'Yield credits after each full day'} · Matures ${formatDate(investment.matures_at)}</p>
+                <p class="text-xs text-on-surface/50 mt-5">${investment.mode === 'compound' ? 'Yield and principal unlock at maturity' : 'Yield credits daily; principal unlocks at maturity'} · Matures ${formatDate(investment.matures_at)}</p>
             </article>
         `;
     }
