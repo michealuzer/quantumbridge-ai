@@ -1029,15 +1029,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             .filter(item => item.mode === 'standard' && Number(item.credited_days || 0) > 0)
             .reduce((sum, item) => sum + Number(item.daily_credit_usd || 0), 0);
 
+        if (form) form.dataset.withdrawableBalance = String(withdrawableBalance);
         if (principalEl) principalEl.textContent = formatCurrency(withdrawableBalance);
         if (balanceEl) balanceEl.textContent = formatCurrency(withdrawableBalance);
         if (todaysCreditEl) todaysCreditEl.textContent = `+${formatCurrency(todaysCredit)}`;
 
         // 2. Render user requests list
         if (listContainer) {
-            if (withdrawalsResult.error) {
-                listContainer.innerHTML = `<p class="text-sm text-red-700 text-center py-8">Failed to load withdrawals: ${escapeHtml(withdrawalsResult.error.message)}</p>`;
-            } else if (withdrawals.length === 0) {
+            if (withdrawals.length === 0) {
                 listContainer.innerHTML = `<p class="text-sm text-on-surface/40 text-center py-8">No pending or past withdrawal requests found.</p>`;
             } else {
                 listContainer.innerHTML = withdrawals.map(w => {
@@ -1104,14 +1103,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 event.preventDefault();
                 const amountInput = document.getElementById('withdraw-amount');
                 const amount = Number(amountInput?.value || 0);
+                const latestWithdrawableBalance = Number(form.dataset.withdrawableBalance || 0);
 
                 if (!Number.isFinite(amount) || amount <= 0) {
                     setWithdrawMessage('Please enter a valid amount.', 'error');
                     return;
                 }
 
-                if (amount > withdrawableBalance) {
-                    setWithdrawMessage(`Withdrawal request exceeds your withdrawable yield balance of ${formatCurrency(withdrawableBalance)}.`, 'error');
+                if (amount > latestWithdrawableBalance) {
+                    setWithdrawMessage(`Withdrawal request exceeds your withdrawable yield balance of ${formatCurrency(latestWithdrawableBalance)}.`, 'error');
                     return;
                 }
 
@@ -1156,9 +1156,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     },
                 });
 
-                if (error) {
+                if (error || data?.error) {
                     setWithdrawState(false);
-                    setWithdrawMessage(data?.error || error.message, 'error');
+                    const message = await getFunctionErrorMessage(error, data, 'Could not submit withdrawal request.');
+                    setWithdrawMessage(message, 'error');
                     return;
                 }
 
@@ -1183,6 +1184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 form.reset();
                 // Refresh data
                 await hydrateWithdrawalPage();
+                setWithdrawMessage(`Your withdrawal request has been submitted and is processing.${emailNote}`, 'success');
             });
         }
     }
